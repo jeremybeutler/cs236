@@ -27,7 +27,5 @@ int main(int argc, char *argv[])
 
 	Lexer lexer = Lexer(in, cout);
 	lexer.Tokenize();
-	/*Token token = Token(ENDFILE, "", 2);
-	cout << token.toString() << std::endl;*/
 	return 0;
 }
