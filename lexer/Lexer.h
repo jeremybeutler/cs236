@@ -2,7 +2,6 @@
 #define LEXER_H
 #include "Token.h"
 #include <cctype>
-//#include "LexerInterface.h"
 
 class Lexer
 {
@@ -20,6 +19,7 @@ public:
 		Token token = Token(DEFAULT, "DEFAULT", -99);
 		char c;
 		bool readFile = true;
+
 		while (readFile)
 		{
 			c = inputFile.get();
@@ -32,107 +32,106 @@ public:
 			{
 				switch (c)
 				{
-				case EOF:
-				{
-					token = Token(ENDFILE, "", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					readFile = false;
-					break;
-				}
-				case ',':
-				{
-					token = Token(COMMA, ",", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case '.':
-				{
-					token = Token(PERIOD, ".", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
+					case EOF:
+					{
+						token = Token(ENDFILE, "", lineNum);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						readFile = false;
+						break;
+					}
+					case ',':
+					{
+						token = Token(COMMA, ",", lineNum);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						break;
+					}
+					case '.':
+					{
+						token = Token(PERIOD, ".", lineNum);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						break;
+					}
 
-				case '?':
-				{
-					token = Token(Q_MARK, "?", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case '(':
-				{
-					token = Token(LEFT_PAREN, "(", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case ')':
-				{
-					token = Token(RIGHT_PAREN, ")", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case ':':
-				{
-					if (inputFile.peek() == '-')
+					case '?':
 					{
-						inputFile.get();
-						token = Token(COLON_DASH, ":-", lineNum);
+						token = Token(Q_MARK, "?", lineNum);
 						outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
-					else
+					case '(':
 					{
-						token = Token(COLON, ":", lineNum);
+						token = Token(LEFT_PAREN, "(", lineNum);
 						outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
-				}
-				case '*':
-				{
-					token = Token(MULTIPLY, "*", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case '+':
-				{
-					token = Token(ADD, "+", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case '\'':
-				{
-					readFile = !(ScanString(c, lineNum));
-					break;
-				}
-				case '#':
-				{
-					readFile = !(ScanComment(c, lineNum));
-					break;
-				}
-				default:
-				{
-					if (isalpha(c))
+					case ')':
 					{
-						readFile = !(ScanIdentifier(c, lineNum));
-					}
-					else
-					{
-						token = Token(UNDEFINED, std::string(1, c), lineNum);
+						token = Token(RIGHT_PAREN, ")", lineNum);
 						outputFile << token.toString() << std::endl;
 						numTokens++;
+						break;
 					}
-					//check whether or not a valid identifier
-					break;
-				}
+					case ':':
+					{
+						if (inputFile.peek() == '-')
+						{
+							inputFile.get();
+							token = Token(COLON_DASH, ":-", lineNum);
+							outputFile << token.toString() << std::endl;
+							numTokens++;
+							break;
+						}
+						else
+						{
+							token = Token(COLON, ":", lineNum);
+							outputFile << token.toString() << std::endl;
+							numTokens++;
+							break;
+						}
+					}
+					case '*':
+					{
+						token = Token(MULTIPLY, "*", lineNum);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						break;
+					}
+					case '+':
+					{
+						token = Token(ADD, "+", lineNum);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						break;
+					}
+					case '\'':
+					{
+						readFile = !(ScanString(c, lineNum));
+						break;
+					}
+					case '#':
+					{
+						readFile = !(ScanComment(c, lineNum));
+						break;
+					}
+					default:
+					{
+						if (isalpha(c))
+						{
+							readFile = !(ScanIdentifier(c, lineNum));
+						}
+						else
+						{
+							token = Token(UNDEFINED, std::string(1, c), lineNum);
+							outputFile << token.toString() << std::endl;
+							numTokens++;
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -155,64 +154,55 @@ public:
 		char peek;
 		str += c;
 		undefStr += c;
-		/*if (inputFile.peek() == '\'')
-		{
-		c = inputFile.get();
-		str += c;
-		return false;
-		}*/
 		while (readString)
 		{
 			c = inputFile.get();
 			switch (c)
 			{
-				//???what to do with multiline string??? for now will assume that multiline strings are invalid
-			case EOF:
-			{
-				//create and print undefined unterminated string token
-				//create and print EOF token
-				isEOF = true;
-				readString = false;
-				token = Token(UNDEFINED, undefStr, lineStart);
-				outputFile << token.toString() << std::endl;
-				numTokens++;
-				token = Token(ENDFILE, "", lineNum);
-				outputFile << token.toString() << std::endl;
-				numTokens++;
-				break;
-			}
-			case '\n':
-			{
-				str += c;
-				undefStr += c;
-				lineNum++;
-				break;
-			}
-			case '\'':
-			{
-				str += c;
-				undefStr += c;
-				peek = inputFile.peek();
-				if (peek == '\'')
+				case EOF:
 				{
-					c = inputFile.get();
-					undefStr += c;
-				}
-				else
-				{
-					token = Token(STRING, undefStr, lineStart);
+					isEOF = true;
+					readString = false;
+					token = Token(UNDEFINED, undefStr, lineStart);
 					outputFile << token.toString() << std::endl;
 					numTokens++;
-					readString = false;
+					token = Token(ENDFILE, "", lineNum);
+					outputFile << token.toString() << std::endl;
+					numTokens++;
+					break;
 				}
-				break;
-			}
-			default:
-			{
-				str += c;
-				undefStr += c;
-				break;
-			}
+				case '\n':
+				{
+					str += c;
+					undefStr += c;
+					lineNum++;
+					break;
+				}
+				case '\'':
+				{
+					str += c;
+					undefStr += c;
+					peek = inputFile.peek();
+					if (peek == '\'')
+					{
+						c = inputFile.get();
+						undefStr += c;
+					}
+					else
+					{
+						token = Token(STRING, undefStr, lineStart);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						readString = false;
+					}
+					break;
+				}
+				default:
+				{
+					str += c;
+					undefStr += c;
+					break;
+				}
 			}
 		}
 		return isEOF;
@@ -232,49 +222,45 @@ public:
 			while (readComment)
 			{
 				c = inputFile.get();
-
 				switch (c)
 				{
-					//???what to do with multiline string??? for now will assume that multiline strings are invalid
-				case EOF:
-				{
-					//create and print undefined unterminated string token
-					//create and print EOF token
-					isEOF = true;
-					readComment = false;
-                    token = Token(UNDEFINED, str, lineStart);
-				    outputFile << token.toString() << std::endl;
-                    numTokens++;
-					token = Token(ENDFILE, "", lineNum);
-					outputFile << token.toString() << std::endl;
-					numTokens++;
-					break;
-				}
-				case '|':
-				{
-					str += c;
-					if (inputFile.peek() == '#')
+					case EOF:
 					{
-						c = inputFile.get();
-						str += c;
+						isEOF = true;
 						readComment = false;
-						token = Token(COMMENT, str, lineStart);
+						token = Token(UNDEFINED, str, lineStart);
+						outputFile << token.toString() << std::endl;
+						numTokens++;
+						token = Token(ENDFILE, "", lineNum);
 						outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
-				}
-				case '\n':
-				{
-					str += c;
-					lineNum++;
-					break;
-				}
-				default:
-				{
-					str += c;
-					break;
-				}
+					case '|':
+					{
+						str += c;
+						if (inputFile.peek() == '#')
+						{
+							c = inputFile.get();
+							str += c;
+							readComment = false;
+							token = Token(COMMENT, str, lineStart);
+							outputFile << token.toString() << std::endl;
+							numTokens++;
+						}
+						break;
+					}
+					case '\n':
+					{
+						str += c;
+						lineNum++;
+						break;
+					}
+					default:
+					{
+						str += c;
+						break;
+					}
 				}
 			}
 
@@ -304,30 +290,26 @@ public:
 				{
 					switch (c)
 					{
-						//???what to do with multiline string??? for now will assume that multiline strings are invalid
-					case EOF:
-					{
-						//create and print undefined unterminated string token
-						//create and print EOF token
-						isEOF = true;
-						readComment = false;
-                        token = Token(UNDEFINED, str, lineStart);
-				        outputFile << token.toString() << std::endl;
-                        numTokens++;
-						token = Token(ENDFILE, "", lineNum);
-						outputFile << token.toString() << std::endl;
-						numTokens++;
-						break;
-					}
-					default:
-					{
-						str += c;
-						break;
-					}
+						case EOF:
+						{
+							isEOF = true;
+							readComment = false;
+							token = Token(UNDEFINED, str, lineStart);
+							outputFile << token.toString() << std::endl;
+							numTokens++;
+							token = Token(ENDFILE, "", lineNum);
+							outputFile << token.toString() << std::endl;
+							numTokens++;
+							break;
+						}
+						default:
+						{
+							str += c;
+							break;
+						}
 					}
 				}
-
-			}
+			}	
 		}
 		str += c;
 		return isEOF;
@@ -336,34 +318,27 @@ public:
 	bool ScanIdentifier(char c, int lineStart)
 	{
 		Token token = Token(DEFAULT, "DEFAULT", -99);
-		//bool readIdent = true;
 		bool isEOF = false;
 		char peek;
 		std::string str;
-		//str += c;
 		while (isalpha(c) || isdigit(c))
 		{
 			switch (c)
 			{
-				//???what to do with multiline string??? for now will assume that multiline strings are invalid
-			case EOF:
-			{
-				//create and print undefined unterminated string token
-				//create and print EOF token
-				isEOF = true;
-				//readIdent = false;
-				token = Token(ENDFILE, "", lineNum);
-				outputFile << token.toString() << std::endl;
-				numTokens++;
-				break;
+				case EOF:
+				{
+					isEOF = true;
+					token = Token(ENDFILE, "", lineNum);
+					outputFile << token.toString() << std::endl;
+					numTokens++;
+					break;
+				}
+				default:
+				{
+					str += c;
+					break;
+				}
 			}
-			default:
-			{
-				str += c;
-				break;
-			}
-			}
-			//inputFile.get();
 			peek = inputFile.peek();
 			if (isalpha(peek) || isdigit(peek)) c = inputFile.get();
 			else break;
