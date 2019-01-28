@@ -138,19 +138,12 @@ public:
 		outputFile << "Total Tokens = " << numTokens << std::endl;
 	}
 
-	/**
-	* Scans string token from input file
-	*
-	* @param c First char. Probably a single open quote.
-	* @param lineNum Current line number in scanned file.
-	* @return Boolean indicating whether or not EOF been reached.
-	*/
 	bool ScanString(char c, int lineStart)
 	{
 		Token token = Token(DEFAULT, "DEFAULT", -99);
+		std::string str, undefStr;
 		bool readString = true;
 		bool isEOF = false;
-		std::string str, undefStr;
 		char peek;
 		str += c;
 		undefStr += c;
@@ -211,9 +204,9 @@ public:
 	bool ScanComment(char c, int lineStart)
 	{
 		Token token = Token(DEFAULT, "DEFAULT", -99);
+		std::string str;
 		bool readComment = true;
 		bool isEOF = false;
-		std::string str;
 		str += c;
 		if (inputFile.peek() == '|')
 		{
@@ -318,9 +311,9 @@ public:
 	bool ScanIdentifier(char c, int lineStart)
 	{
 		Token token = Token(DEFAULT, "DEFAULT", -99);
+		std::string str;
 		bool isEOF = false;
 		char peek;
-		std::string str;
 		while (isalpha(c) || isdigit(c))
 		{
 			switch (c)
