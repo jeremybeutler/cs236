@@ -15,6 +15,13 @@
 #include <fstream>
 #include "../lexer/Token.h"
 #include "../lexer/Lexer.h"
+#include "Parser.h"
+#include "Parameter.h"
+#include "Predicate.h"
+#include "Rule.h"
+#include "Schemes.h"
+#include "Facts.h"
+#include "Rules.h"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -28,7 +35,13 @@ int main(int argc, char *argv[])
     Lexer lexer = Lexer(in, cout);
 	lexer.Tokenize();
     vector<Token> tokens = lexer.tokens();
-    DatalogProgram program = DatalogProgram(tokens, cout);
+    Parser parser = Parser(tokens, cout);
+    try {
+        parser.parse();
+    } catch (Token error) { 
+        cout << "Failure! " << endl << error.toString();
+    }
+    
 
 	return 0;
 }

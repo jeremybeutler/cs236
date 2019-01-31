@@ -14,6 +14,11 @@ private:
 public:
 	Token(TokenType type, std::string value, int lineNum) : type(type), value(value), lineNum(lineNum) {}
 
+	TokenType getType()
+	{
+		return type;
+	}
+
 	int getLineNum()
 	{
 		return lineNum;
