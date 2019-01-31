@@ -2,6 +2,7 @@
 #define LEXER_H
 #include "Token.h"
 #include <cctype>
+#include <vector>
 
 class Lexer
 {
@@ -10,9 +11,21 @@ private:
 	std::ostream &outputFile;
 	int numTokens;
 	int lineNum;
+	std::vector<Token> tokenList;
 
 public:
 	Lexer(std::ifstream &in, std::ostream &out) : inputFile(in), outputFile(out), numTokens(0), lineNum(1) {}
+
+	std::string toString() 
+	{
+		std::stringstream out;
+		for (unsigned int i = 0; i < tokenList.size(); i++)
+		{
+			out << tokenList.at(i).toString() << std::endl;
+		}
+		out << "Total Tokens = " << numTokens << std::endl;
+		return out.str(); 
+	}
 
 	void Tokenize()
 	{
@@ -35,7 +48,8 @@ public:
 					case EOF:
 					{
 						token = Token(ENDFILE, "", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						readFile = false;
 						break;
@@ -43,14 +57,16 @@ public:
 					case ',':
 					{
 						token = Token(COMMA, ",", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
 					case '.':
 					{
 						token = Token(PERIOD, ".", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
@@ -58,21 +74,24 @@ public:
 					case '?':
 					{
 						token = Token(Q_MARK, "?", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
 					case '(':
 					{
 						token = Token(LEFT_PAREN, "(", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
 					case ')':
 					{
 						token = Token(RIGHT_PAREN, ")", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
@@ -82,14 +101,16 @@ public:
 						{
 							inputFile.get();
 							token = Token(COLON_DASH, ":-", lineNum);
-							outputFile << token.toString() << std::endl;
+							tokenList.push_back(token);
+							// outputFile << token.toString() << std::endl;
 							numTokens++;
 							break;
 						}
 						else
 						{
 							token = Token(COLON, ":", lineNum);
-							outputFile << token.toString() << std::endl;
+							tokenList.push_back(token);
+							// outputFile << token.toString() << std::endl;
 							numTokens++;
 							break;
 						}
@@ -97,14 +118,16 @@ public:
 					case '*':
 					{
 						token = Token(MULTIPLY, "*", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
 					case '+':
 					{
 						token = Token(ADD, "+", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
@@ -127,7 +150,8 @@ public:
 						else
 						{
 							token = Token(UNDEFINED, std::string(1, c), lineNum);
-							outputFile << token.toString() << std::endl;
+							tokenList.push_back(token);
+							// outputFile << token.toString() << std::endl;
 							numTokens++;
 						}
 						break;
@@ -135,7 +159,7 @@ public:
 				}
 			}
 		}
-		outputFile << "Total Tokens = " << numTokens << std::endl;
+		// outputFile << "Total Tokens = " << numTokens << std::endl;
 	}
 
 	bool ScanString(char c, int lineStart)
@@ -157,10 +181,12 @@ public:
 					isEOF = true;
 					readString = false;
 					token = Token(UNDEFINED, undefStr, lineStart);
-					outputFile << token.toString() << std::endl;
+					tokenList.push_back(token);
+					// outputFile << token.toString() << std::endl;
 					numTokens++;
 					token = Token(ENDFILE, "", lineNum);
-					outputFile << token.toString() << std::endl;
+					tokenList.push_back(token);
+					// outputFile << token.toString() << std::endl;
 					numTokens++;
 					break;
 				}
@@ -184,7 +210,8 @@ public:
 					else
 					{
 						token = Token(STRING, undefStr, lineStart);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						readString = false;
 					}
@@ -222,10 +249,12 @@ public:
 						isEOF = true;
 						readComment = false;
 						token = Token(UNDEFINED, str, lineStart);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						token = Token(ENDFILE, "", lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						break;
 					}
@@ -238,7 +267,8 @@ public:
 							str += c;
 							readComment = false;
 							token = Token(COMMENT, str, lineStart);
-							outputFile << token.toString() << std::endl;
+							tokenList.push_back(token);
+							// outputFile << token.toString() << std::endl;
 							numTokens++;
 						}
 						break;
@@ -269,7 +299,8 @@ public:
 					{
 						readComment = false;
 						token = Token(COMMENT, str, lineNum);
-						outputFile << token.toString() << std::endl;
+						tokenList.push_back(token);
+						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						lineNum++;
 						break;
@@ -288,10 +319,12 @@ public:
 							isEOF = true;
 							readComment = false;
 							token = Token(UNDEFINED, str, lineStart);
-							outputFile << token.toString() << std::endl;
+							tokenList.push_back(token);
+							// outputFile << token.toString() << std::endl;
 							numTokens++;
 							token = Token(ENDFILE, "", lineNum);
-							outputFile << token.toString() << std::endl;
+							tokenList.push_back(token);
+							// outputFile << token.toString() << std::endl;
 							numTokens++;
 							break;
 						}
@@ -322,7 +355,8 @@ public:
 				{
 					isEOF = true;
 					token = Token(ENDFILE, "", lineNum);
-					outputFile << token.toString() << std::endl;
+					tokenList.push_back(token);
+					// outputFile << token.toString() << std::endl;
 					numTokens++;
 					break;
 				}
@@ -344,8 +378,9 @@ public:
 			else if (str == "Queries") token = Token(QUERIES, str, lineNum);
 			else token = Token(ID, str, lineNum);
 
+			tokenList.push_back(token);
 			numTokens++;
-			outputFile << token.toString() << std::endl;
+			// outputFile << token.toString() << std::endl;
 		}
 		return isEOF;
 	}

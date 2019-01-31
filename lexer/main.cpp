@@ -27,5 +27,6 @@ int main(int argc, char *argv[])
 
 	Lexer lexer = Lexer(in, cout);
 	lexer.Tokenize();
+	cout << lexer.toString();
 	return 0;
 }
