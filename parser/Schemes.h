@@ -1,5 +1,5 @@
-#ifndef RULE_H
-#define RULE_H
+#ifndef SCHEMES_H
+#define SCHEMES_H
 #include "../lexer/Token.h"
 #include <iostream>
 #include <string>
@@ -8,7 +8,7 @@
 #include <cctype>
 #include <vector>
 
-class Rule
+class Schemes
 {
 private:
 	
@@ -16,4 +16,4 @@ public:
 	
 };
 
-#endif // RULE_H
+#endif // SCHEMES_H

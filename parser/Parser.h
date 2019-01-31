@@ -1,5 +1,5 @@
-#ifndef RULE_H
-#define RULE_H
+#ifndef PARSER_H
+#define PARSER_H
 #include "../lexer/Token.h"
 #include <iostream>
 #include <string>
@@ -8,7 +8,7 @@
 #include <cctype>
 #include <vector>
 
-class Rule
+class Parser
 {
 private:
 	
@@ -16,4 +16,4 @@ public:
 	
 };
 
-#endif // RULE_H
+#endif // PARSER_H

@@ -16,6 +16,11 @@ private:
 public:
 	Lexer(std::ifstream &in, std::ostream &out) : inputFile(in), outputFile(out), numTokens(0), lineNum(1) {}
 
+	vector<Token> tokens()
+	{
+		return tokenList;
+	}
+
 	std::string toString() 
 	{
 		std::stringstream out;
