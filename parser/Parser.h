@@ -26,14 +26,15 @@ public:
     
     void getToken()
     {
-        token = tokenList.at(counter + 1);
+        counter++;
+        token = tokenList.at(counter);
     }
 
     void datalog_program()
     {
         match(SCHEMES);
         match(COLON);
-        schemes();
+        scheme();
         scheme_list();
         match(FACTS);
         match(COLON);
@@ -43,6 +44,7 @@ public:
         rule_list();
         match(QUERIES);
         match(COLON);
+        query();
         query_list();
     }
 
@@ -59,78 +61,170 @@ public:
         throw token;
     }
 
-    void schemes()
-    {
-
-    }
-
     void scheme_list()
     {
+        if (token.getType() == ID)
+        {
+            scheme();
+            scheme_list();
+        }
     }
 
     void fact_list()
     {
+        if (token.getType() == ID)
+        {
+            fact();
+            fact_list();
+        }
     }
 
     void rule_list()
     {
+        if (token.getType() == ID)
+        {
+            rule();
+            rule_list();
+        }
     }
 
     void query_list()
     {
+        if (token.getType() == ID)
+        {
+            query();
+            query_list();
+        }
     }
 
     void scheme()
     {
+        match(ID);
+        match(LEFT_PAREN);
+        match(ID);
+        id_list();
+        match(RIGHT_PAREN);
     }
 
     void fact()
     {
-    }
-
-    void scheme()
-    {
-    }
-
-    void fact()
-    {
+        match(ID);
+        match(LEFT_PAREN);
+        match(STRING);
+        string_list();
+        match(RIGHT_PAREN);
+        match(PERIOD);
     }
 
     void rule()
     {
+        head_predicate();
+        match(COLON_DASH);
+        predicate();
+        predicate_list();
+        match(PERIOD);
     }
 
     void query()
     {
+        predicate();
+        match(Q_MARK);
     }
 
     void head_predicate()
     {
+        match(ID);
+        match(LEFT_PAREN);
+        match(ID);
+        id_list();
+        match(RIGHT_PAREN);
     }
 
     void predicate()
     {
-
+        match(ID);
+        match(LEFT_PAREN);
+        parameter();
+        parameter_list();
+        match(RIGHT_PAREN);
     }
 
     void predicate_list()
     {
-
+        if (token.getType() == COMMA)
+        {
+            match(COMMA);
+            predicate();
+            predicate_list();
+        }
     }
 
     void parameter_list()
     {
-
+        if (token.getType() == COMMA)
+        {
+            match(COMMA);
+            parameter();
+            parameter_list();
+        }
     }
 
     void string_list()
     {
-
+        if (token.getType() == COMMA)
+        {
+            match(COMMA);
+            match(STRING);
+            string_list();
+        }
     }
 
     void id_list()
     {
+        if (token.getType() == COMMA)
+        {
+            match(COMMA);
+            match(ID);
+            id_list();
+        }
+    }
 
+    void parameter()
+    {
+        if (token.getType() == STRING)
+        {
+            match(STRING);
+        }
+        else if (token.getType() == ID)
+        {
+            match(ID);
+        }
+        else
+        {
+            expression();
+        }
+
+    }
+
+    void expression()
+    {
+        match(LEFT_PAREN);
+        parameter();
+        operator_();
+        parameter();
+        match(RIGHT_PAREN);
+    }
+
+    void operator_()
+    {
+        if (token.getType() == ADD)
+        {
+            match(ADD);
+        }
+        else
+        {
+            match(MULTIPLY);
+        }
     }
 	
 };

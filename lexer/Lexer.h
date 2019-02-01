@@ -16,7 +16,7 @@ private:
 public:
 	Lexer(std::ifstream &in, std::ostream &out) : inputFile(in), outputFile(out), numTokens(0), lineNum(1) {}
 
-	vector<Token> tokens()
+	std::vector<Token> tokens()
 	{
 		return tokenList;
 	}
@@ -272,7 +272,7 @@ public:
 							str += c;
 							readComment = false;
 							token = Token(COMMENT, str, lineStart);
-							tokenList.push_back(token);
+							// tokenList.push_back(token);
 							// outputFile << token.toString() << std::endl;
 							numTokens++;
 						}
@@ -304,7 +304,7 @@ public:
 					{
 						readComment = false;
 						token = Token(COMMENT, str, lineNum);
-						tokenList.push_back(token);
+						// tokenList.push_back(token);
 						// outputFile << token.toString() << std::endl;
 						numTokens++;
 						lineNum++;

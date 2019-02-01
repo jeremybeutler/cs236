@@ -34,14 +34,13 @@ int main(int argc, char *argv[])
 
     Lexer lexer = Lexer(in, cout);
 	lexer.Tokenize();
-    vector<Token> tokens = lexer.tokens();
+    std::vector<Token> tokens = lexer.tokens();
     Parser parser = Parser(tokens, cout);
     try {
         parser.parse();
+        cout << "Success!" << endl;
     } catch (Token error) { 
         cout << "Failure! " << endl << error.toString();
     }
-    
-
 	return 0;
 }
