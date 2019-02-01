@@ -11,7 +11,7 @@
 class Parser
 {
 private:
-    int counter;
+    unsigned int counter;
     Token token;
     std::vector<Token> tokenList;
     std::ostream &outputFile;
@@ -46,7 +46,12 @@ public:
         match(COLON);
         query();
         query_list();
-    }
+        if (tokenList.size() - 1 !=  counter) 
+        {
+            error();
+        }
+
+    } 
 
     void match(TokenType t)
     {
