@@ -13,7 +13,10 @@ class Rule
 private:
 	
 public:
-	
+	std::string toString()
+    {
+        
+    }
 };
 
 #endif // RULE_H

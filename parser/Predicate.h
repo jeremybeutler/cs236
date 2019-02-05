@@ -11,8 +11,14 @@
 class Predicate
 {
 private:
-	
+	std::string type;
+    std::string id;
+    std::vector<std::string> list;
 public:
+    std::string toString()
+    {
+
+    }
 	
 };
 

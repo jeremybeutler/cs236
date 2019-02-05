@@ -19,9 +19,7 @@
 #include "Parameter.h"
 #include "Predicate.h"
 #include "Rule.h"
-#include "Schemes.h"
 #include "Facts.h"
-#include "Rules.h"
 using namespace std;
 
 int main(int argc, char *argv[])

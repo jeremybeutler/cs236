@@ -1,6 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include "../lexer/Token.h"
+#include "Rule.h"
+#include "Predicate.h"
+#include "Parameter.h"
 #include <iostream>
 #include <string>
 #include <sstream> 
@@ -147,6 +150,7 @@ public:
 
     void predicate()
     {
+        Predicate predicate = Predicate();
         match(ID);
         match(LEFT_PAREN);
         parameter();

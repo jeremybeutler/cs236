@@ -11,9 +11,14 @@
 class Parameter
 {
 private:
+    std::string param;
+    std::string type;
 	
 public:
-	
+	std::string toString()
+    {
+        
+    }
 };
 
 #endif // PARAMETER_H

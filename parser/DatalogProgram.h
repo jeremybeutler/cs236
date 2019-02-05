@@ -6,9 +6,6 @@
 #include "Parameter.h"
 #include "Predicate.h"
 #include "Rule.h"
-#include "Schemes.h"
-#include "Facts.h"
-#include "Rules.h"
 
 #include <iostream>
 #include <string>
@@ -20,7 +17,10 @@
 class DatalogProgram
 {
 private:
-	
+	std::vector<Predicate> schemes;
+    std::vector<Predicate> facts;
+    std::vector<Rule> rules;
+    std::vector<Predicate> queries;
 public:
 
 
