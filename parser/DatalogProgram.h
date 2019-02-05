@@ -22,7 +22,25 @@ private:
     std::vector<Rule> rules;
     std::vector<Predicate> queries;
 public:
+    void addScheme(Predicate scheme)
+    {
+        schemes.push_back(scheme);
+    }
 
+    void addFact(Predicate fact)
+    {
+        facts.push_back(fact);
+    }
+
+    void addFact(Rule rule)
+    {
+        rules.push_back(rule);
+    }
+
+    void addQuery(Predicate query)
+    {
+        queries.push_back(query);
+    }
 
 };
 
