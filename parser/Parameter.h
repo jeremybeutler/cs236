@@ -11,13 +11,15 @@
 class Parameter
 {
 private:
-    std::string param;
     std::string type;
+    std::string param;
 	
 public:
+    Parameter(std::string type, std::string param) : type(type), param(param),  {}
+
 	std::string toString()
     {
-        
+
     }
 };
 

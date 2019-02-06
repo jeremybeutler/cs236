@@ -15,6 +15,8 @@ private:
     std::string id;
     std::vector<std::string> list;
 public:
+    Predicate(std::string type, std::string id, std::vector<std::string> list) : type(type), id(id), list(list) {}
+    
     std::string toString()
     {
 

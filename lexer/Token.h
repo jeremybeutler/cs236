@@ -19,6 +19,11 @@ public:
 		return type;
 	}
 
+	std::string getValue()
+	{
+		return value;
+	}
+
 	int getLineNum()
 	{
 		return lineNum;

@@ -22,6 +22,8 @@ private:
     std::vector<Rule> rules;
     std::vector<Predicate> queries;
 public:
+    DatalogProgram(/*std::vector<Predicate> schemes, std::vector<Predicate> facts, std::vector<Rule> rules, std::vector<Predicate> queries*/) : /*schemes(schemes), facts(facts), rules(rules), queries(queries) */{}
+
     void addScheme(Predicate scheme)
     {
         schemes.push_back(scheme);

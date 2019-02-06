@@ -11,11 +11,14 @@
 class Rule
 {
 private:
-	
+	Predicate predicateHead;
+    std::vector<Predicate> predicateList;
 public:
+    Rule(Predicate predicateHead, std::vector<Predicate> predicateList) : predicateHead(predicateHead), predicateList(predicateList) {}
+
 	std::string toString()
     {
-        
+
     }
 };
 
