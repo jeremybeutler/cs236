@@ -22,7 +22,7 @@ private:
     std::vector<Rule> rules;
     std::vector<Predicate> queries;
 public:
-    DatalogProgram(/*std::vector<Predicate> schemes, std::vector<Predicate> facts, std::vector<Rule> rules, std::vector<Predicate> queries*/) : /*schemes(schemes), facts(facts), rules(rules), queries(queries) */{}
+    DatalogProgram() : schemes(0), facts(0), rules(0), queries(0) {}
 
     void addScheme(Predicate scheme)
     {
@@ -34,7 +34,7 @@ public:
         facts.push_back(fact);
     }
 
-    void addFact(Rule rule)
+    void addRule(Rule rule)
     {
         rules.push_back(rule);
     }

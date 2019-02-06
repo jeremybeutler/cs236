@@ -1,6 +1,10 @@
 #ifndef RULE_H
 #define RULE_H
 #include "../lexer/Token.h"
+#include "Parameter.h"
+#include "Predicate.h"
+#include "Facts.h"
+
 #include <iostream>
 #include <string>
 #include <sstream> 
@@ -18,7 +22,8 @@ public:
 
 	std::string toString()
     {
-
+        std::stringstream out;
+        return out.str();
     }
 };
 
