@@ -7,7 +7,7 @@
 #include "Parameter.h"
 #include <iostream>
 #include <string>
-#include <sstream> 
+#include <sstream>
 #include <fstream>
 #include <cctype>
 #include <vector>
@@ -15,23 +15,25 @@
 class Parser
 {
 private:
-    DatalogProgram program;
-    Predicate p;
-    Rule r;
-    Parameter pa;
     Token token;
     std::vector<Token> tokenList;
     std::ostream &outputFile;
     unsigned int counter;
+
+    std::vector<Predicate> schemes;
+    std::vector<Predicate> facts;
+    std::vector<Rule> rules;
+    std::vector<Predicate> queries;
 public:
 
-    Parser(Predicate p, Rule r, Parameter pa, std::vector<Token> tokenList, std::ostream &out) : p(p), r(r), pa(pa), token(tokenList.at(0)), tokenList(tokenList), outputFile(out), counter(0) {}
+    Parser(std::vector<Token> tokenList, std::ostream &out) : token(tokenList.at(0)), tokenList(tokenList), outputFile(out), counter(0), schemes(0), facts(0), rules(0), queries(0) {}
 
-    void parse()
+    DatalogProgram parse()
     {
         datalog_program();
+        return DatalogProgram(schemes, facts, rules, queries);
     }
-    
+
     void getToken()
     {
         counter++;
@@ -54,19 +56,19 @@ public:
         match(COLON);
         query();
         query_list();
-        if (tokenList.size() - 1 !=  counter) 
+        if (tokenList.size() - 1 !=  counter)
         {
             error();
         }
 
-    } 
+    }
 
     void match(TokenType t)
     {
         if (token.getType() == t)
-			getToken();
-		else
-			error();
+			     getToken();
+    		else
+    			error();
     }
 
     void error()
@@ -120,8 +122,7 @@ public:
         match(ID);
         id_list(list);
         match(RIGHT_PAREN);
-        p = Predicate("scheme", id, list);
-        program.addScheme(p);
+        schemes.push_back(Predicate("scheme", id, list));
     }
 
     void fact()
@@ -135,32 +136,29 @@ public:
         string_list(list);
         match(RIGHT_PAREN);
         match(PERIOD);
-        p = Predicate("fact", id, list);
-        program.addFact(p);
+        facts.push_back(Predicate("fact", id, list));
     }
 
     void rule()
     {
         std::vector<Predicate> list;
-        head_predicate();
-        Predicate predicateHead = p;
+        Predicate predicateHead = head_predicate();
         match(COLON_DASH);
-        predicate();
+        Predicate p = predicate();
         list.push_back(p);
         predicate_list(list);
         match(PERIOD);
-        r = Rule(predicateHead, list);
-        program.addRule(r);
+        rules.push_back(Rule(predicateHead, list));
     }
 
     void query()
     {
-        predicate();
+        Predicate p = predicate();
         match(Q_MARK);
-        program.addQuery(p);
+        queries.push_back(p);
     }
 
-    void head_predicate()
+    Predicate head_predicate()
     {
         std::vector<std::string> list;
         std::string id = token.getValue();
@@ -170,10 +168,10 @@ public:
         match(ID);
         id_list(list);
         match(RIGHT_PAREN);
-        p = Predicate("head_predicate", id, list);
+        return Predicate("head_predicate", id, list);
     }
 
-    void predicate()
+    Predicate predicate()
     {
         std::vector<std::string> list;
         std::string id = token.getValue();
@@ -182,7 +180,7 @@ public:
         parameter(list);
         parameter_list(list);
         match(RIGHT_PAREN);
-        p = Predicate("predicate", id, list);
+        return Predicate("predicate", id, list);
     }
 
     void predicate_list(std::vector<Predicate> &list)
@@ -190,7 +188,7 @@ public:
         if (token.getType() == COMMA)
         {
             match(COMMA);
-            predicate();
+            Predicate p = predicate();
             list.push_back(p);
             predicate_list(list);
         }
@@ -271,7 +269,7 @@ public:
             match(MULTIPLY);
         }
     }
-	
+
 };
 
 #endif // PARSER_H

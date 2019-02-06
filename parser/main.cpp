@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-#define _CRTDBG_MAP_ALLOC  
+#define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #define VS_MEM_CHECK _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #else
@@ -11,7 +11,7 @@
 #include <cmath>
 #include <iomanip>
 #include <string>
-#include <sstream> 
+#include <sstream>
 #include <fstream>
 #include "../lexer/Token.h"
 #include "../lexer/Lexer.h"
@@ -29,22 +29,22 @@ int main(int argc, char *argv[])
 	//	Create input stream from argv[1] and output stream to argv[2]
 
 	ifstream in(argv[1]);
-    std::string DEFAULT = "DEFAULT";
-    std::vector<std::string> DEFAULT_LIST;
-    std::vector<Predicate> DEFAULT_LIST_P;
-    
-    Predicate p = Predicate(DEFAULT, DEFAULT, DEFAULT_LIST);
-    Rule r = Rule(p, DEFAULT_LIST_P);
-    Parameter pa = Parameter(DEFAULT, DEFAULT);
+    // std::string DEFAULT = "DEFAULT";
+    // std::vector<std::string> DEFAULT_LIST;
+    // std::vector<Predicate> DEFAULT_LIST_P;
+		//
+    // Predicate p = Predicate(DEFAULT, DEFAULT, DEFAULT_LIST);
+    // Rule r = Rule(p, DEFAULT_LIST_P);
+    // Parameter pa = Parameter(DEFAULT, DEFAULT);
 
     Lexer lexer = Lexer(in, cout);
-	lexer.Tokenize();
+		lexer.Tokenize();
     std::vector<Token> tokens = lexer.tokens();
-    Parser parser = Parser(p, r, pa, tokens, cout);
+    Parser parser = Parser(tokens, cout);
     try {
-        parser.parse();
+        DatalogProgram program = parser.parse();
         cout << "Success!" << endl;
-    } catch (Token error) { 
+    } catch (Token error) {
         cout << "Failure! " << endl << error.toString();
     }
 	return 0;
