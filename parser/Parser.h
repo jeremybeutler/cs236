@@ -5,11 +5,7 @@
 #include "Rule.h"
 #include "Predicate.h"
 #include "Parameter.h"
-#include <iostream>
 #include <string>
-#include <sstream>
-#include <fstream>
-#include <cctype>
 #include <vector>
 
 class Parser
@@ -17,8 +13,7 @@ class Parser
 private:
     Token token;
     std::vector<Token> tokenList;
-    std::ostream &outputFile;
-    unsigned int counter;
+    unsigned int counter = 0;
 
     std::vector<Predicate> schemes;
     std::vector<Predicate> facts;
@@ -26,7 +21,8 @@ private:
     std::vector<Predicate> queries;
 public:
 
-    Parser(std::vector<Token> tokenList, std::ostream &out) : token(tokenList.at(0)), tokenList(tokenList), outputFile(out), counter(0), schemes(0), facts(0), rules(0), queries(0) {}
+    Parser(std::vector<Token> tokenList, std::ostream &out)
+        : token(tokenList.at(0)), tokenList(tokenList) {}
 
     DatalogProgram parse()
     {

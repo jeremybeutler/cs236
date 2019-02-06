@@ -8,18 +8,10 @@
 
 #include <iostream>
 #include <vector>
-#include <cmath>
-#include <iomanip>
-#include <string>
-#include <sstream>
 #include <fstream>
 #include "../lexer/Token.h"
 #include "../lexer/Lexer.h"
 #include "Parser.h"
-#include "Parameter.h"
-#include "Predicate.h"
-#include "Rule.h"
-#include "Facts.h"
 using namespace std;
 
 int main(int argc, char *argv[])

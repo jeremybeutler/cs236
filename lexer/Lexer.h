@@ -2,6 +2,7 @@
 #define LEXER_H
 #include "Token.h"
 #include <cctype>
+#include <sstream>
 #include <vector>
 
 class Lexer
@@ -21,7 +22,7 @@ public:
 		return tokenList;
 	}
 
-	std::string toString() 
+	std::string toString()
 	{
 		std::stringstream out;
 		for (unsigned int i = 0; i < tokenList.size(); i++)
@@ -29,7 +30,7 @@ public:
 			out << tokenList.at(i).toString() << std::endl;
 		}
 		out << "Total Tokens = " << numTokens << std::endl;
-		return out.str(); 
+		return out.str();
 	}
 
 	void Tokenize()
@@ -340,7 +341,7 @@ public:
 						}
 					}
 				}
-			}	
+			}
 		}
 		str += c;
 		return isEOF;
