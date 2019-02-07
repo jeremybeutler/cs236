@@ -30,14 +30,14 @@ int main(int argc, char *argv[])
     // Parameter pa = Parameter(DEFAULT, DEFAULT);
 
     Lexer lexer = Lexer(in, cout);
-		lexer.Tokenize();
+    lexer.Tokenize();
     std::vector<Token> tokens = lexer.tokens();
     Parser parser = Parser(tokens, cout);
     try {
         DatalogProgram program = parser.parse();
-        cout << "Success!" << endl << program.toString(); 
+        cout << "Success!" << std::endl << program.toString(); 
     } catch (Token error) {
-        cout << "Failure! " << endl << error.toString();
+        cout << "Failure!" << std::endl << "  " << error.toString();
     }
 	return 0;
 }

@@ -7,6 +7,7 @@
 #include "Parameter.h"
 #include <string>
 #include <vector>
+#include <algorithm>
 
 class Parser
 {
@@ -19,6 +20,7 @@ private:
     std::vector<Predicate> facts;
     std::vector<Rule> rules;
     std::vector<Predicate> queries;
+    std::vector<std::string> domains;
 public:
 
     Parser(std::vector<Token> tokenList, std::ostream &out)
@@ -27,7 +29,9 @@ public:
     DatalogProgram parse()
     {
         datalog_program();
-        return DatalogProgram(schemes, facts, rules, queries);
+        sort(domains.begin(), domains.end());
+        domains.erase(unique(domains.begin(), domains.end()), domains.end());
+        return DatalogProgram(schemes, facts, rules, queries, domains);
     }
 
     void getToken()
@@ -59,12 +63,14 @@ public:
 
     }
 
-    void match(TokenType t)
+    void match(TokenType t, bool advance = true)
     {
         if (token.getType() == t)
-			     getToken();
-    		else
-    			error();
+        {
+            if (advance) getToken();
+        }
+        else
+            error();
     }
 
     void error()
@@ -135,6 +141,10 @@ public:
         match(RIGHT_PAREN);
         match(PERIOD);
         facts.push_back(Predicate("HEAD_PREDICATE", id, list, listStr));
+        for (unsigned int i = 0; i < listStr.size(); i++)
+        {
+            domains.push_back(listStr.at(i));
+        }
     }
 
     void rule()
@@ -226,59 +236,61 @@ public:
         }
     }
 
-    std::string parameter(std::vector<Parameter> &list, bool pushParam = true)
+    std::string parameter(std::vector<Parameter> &list)
     {
         std::string paramVal = token.getValue();
         if (token.getType() == STRING)
         {
-            if (pushParam)
-            {
-                Parameter p = Parameter("STRING", paramVal);
-                list.push_back(p);
-            }
+            Parameter p = Parameter("STRING", paramVal);
+            list.push_back(p);
             match(STRING);
         }
         else if (token.getType() == ID)
         {
-            if (pushParam)
-            {
-                Parameter p = Parameter("ID", paramVal);
-                list.push_back(p);
-            }
+            Parameter p = Parameter("ID", paramVal);
+            list.push_back(p);
             match(ID);
         }
         else
         {
-            paramVal = expression(list);
-            if (pushParam)
-            {
-                Parameter p = Parameter("EXPRESSION", paramVal);
-                list.push_back(p);
-            }
-
+            paramVal = expression();
+            Parameter p = Parameter("EXPRESSION", paramVal);
+            list.push_back(p);
         }
         return paramVal;
 
     }
 
-    std::string expression(std::vector<Parameter> &list)
+    std::string expression()
     {
         std::stringstream out;
         std::string paramVal;
-        //list.push_back(token.getValue());
         out << token.getValue();
         match(LEFT_PAREN);
-        paramVal = parameter(list, false);
-        //Parameter p = Parameter("STRING", paramVal);
-        //list.push_back(p);
-        out << paramVal;
+        paramVal = token.getValue();
+        if (paramVal == "(")
+        {
+            paramVal = expression();
+            out << paramVal;
+        }
+        else
+        {
+            out << paramVal;
+            getToken();
+        }
         out << operator_();
-        paramVal = parameter(list, false);
-        //p = Parameter("STRING", paramVal);
-        //list.push_back(p);
-        out << paramVal;
+        paramVal = token.getValue();
+        if (paramVal == "(")
+        {
+            paramVal = expression();
+            out << paramVal;
+        }
+        else
+        {
+            out << paramVal;
+            getToken();
+        }
         out << token.getValue();
-        //list.push_back(token.getValue());
         match(RIGHT_PAREN);
         return out.str();
     }
@@ -302,20 +314,3 @@ public:
 };
 
 #endif // PARSER_H
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// snap(D,Y,B,(E+C))
-//
-// D Y B ( E + C )
-//
-// D Y B ( E + ( A * B
-//
-//
