@@ -16,6 +16,10 @@ public:
 	std::string toString()
   {
       std::stringstream out;
+      if (type == "STRING") out << param;
+      else if (type == "ID") out << param;
+      else if (type == "EXPRESSION") out << param;
+
       return out.str();
   }
 };

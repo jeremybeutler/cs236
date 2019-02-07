@@ -110,29 +110,31 @@ public:
 
     void scheme()
     {
-        std::vector<std::string> list;
+        std::vector<Parameter> list;
+        std::vector<std::string> listStr;
         std::string id = token.getValue();
         match(ID);
         match(LEFT_PAREN);
-        list.push_back(token.getValue());
+        listStr.push_back(token.getValue());
         match(ID);
-        id_list(list);
+        id_list(listStr);
         match(RIGHT_PAREN);
-        schemes.push_back(Predicate("scheme", id, list));
+        schemes.push_back(Predicate("HEAD_PREDICATE", id, list, listStr));
     }
 
     void fact()
     {
-        std::vector<std::string> list;
+        std::vector<Parameter> list;
+        std::vector<std::string> listStr;
         std::string id = token.getValue();
         match(ID);
         match(LEFT_PAREN);
-        list.push_back(token.getValue());
+        listStr.push_back(token.getValue());
         match(STRING);
-        string_list(list);
+        string_list(listStr);
         match(RIGHT_PAREN);
         match(PERIOD);
-        facts.push_back(Predicate("fact", id, list));
+        facts.push_back(Predicate("HEAD_PREDICATE", id, list, listStr));
     }
 
     void rule()
@@ -156,27 +158,29 @@ public:
 
     Predicate head_predicate()
     {
-        std::vector<std::string> list;
+        std::vector<Parameter> list;
+        std::vector<std::string> listStr;
         std::string id = token.getValue();
         match(ID);
         match(LEFT_PAREN);
-        list.push_back(token.getValue());
+        listStr.push_back(token.getValue());
         match(ID);
-        id_list(list);
+        id_list(listStr);
         match(RIGHT_PAREN);
-        return Predicate("head_predicate", id, list);
+        return Predicate("HEAD_PREDICATE", id, list, listStr);
     }
 
     Predicate predicate()
     {
-        std::vector<std::string> list;
+        std::vector<Parameter> list;
+        std::vector<std::string> listStr;
         std::string id = token.getValue();
         match(ID);
         match(LEFT_PAREN);
         parameter(list);
         parameter_list(list);
         match(RIGHT_PAREN);
-        return Predicate("predicate", id, list);
+        return Predicate("PREDICATE", id, list, listStr);
     }
 
     void predicate_list(std::vector<Predicate> &list)
@@ -190,7 +194,7 @@ public:
         }
     }
 
-    void parameter_list(std::vector<std::string> &list)
+    void parameter_list(std::vector<Parameter> &list)
     {
         if (token.getType() == COMMA)
         {
@@ -222,50 +226,96 @@ public:
         }
     }
 
-    void parameter(std::vector<std::string> &list)
+    std::string parameter(std::vector<Parameter> &list, bool pushParam = true)
     {
+        std::string paramVal = token.getValue();
         if (token.getType() == STRING)
         {
-            list.push_back(token.getValue());
+            if (pushParam)
+            {
+                Parameter p = Parameter("STRING", paramVal);
+                list.push_back(p);
+            }
             match(STRING);
         }
         else if (token.getType() == ID)
         {
-            list.push_back(token.getValue());
+            if (pushParam)
+            {
+                Parameter p = Parameter("ID", paramVal);
+                list.push_back(p);
+            }
             match(ID);
         }
         else
         {
-            expression(list);
+            paramVal = expression(list);
+            if (pushParam)
+            {
+                Parameter p = Parameter("EXPRESSION", paramVal);
+                list.push_back(p);
+            }
+
         }
+        return paramVal;
 
     }
 
-    void expression(std::vector<std::string> &list)
+    std::string expression(std::vector<Parameter> &list)
     {
-        list.push_back(token.getValue());
+        std::stringstream out;
+        std::string paramVal;
+        //list.push_back(token.getValue());
+        out << token.getValue();
         match(LEFT_PAREN);
-        parameter(list);
-        operator_(list);
-        parameter(list);
-        list.push_back(token.getValue());
+        paramVal = parameter(list, false);
+        //Parameter p = Parameter("STRING", paramVal);
+        //list.push_back(p);
+        out << paramVal;
+        out << operator_();
+        paramVal = parameter(list, false);
+        //p = Parameter("STRING", paramVal);
+        //list.push_back(p);
+        out << paramVal;
+        out << token.getValue();
+        //list.push_back(token.getValue());
         match(RIGHT_PAREN);
+        return out.str();
     }
 
-    void operator_(std::vector<std::string> &list)
+    std::string operator_()
     {
+        std::string opVal = token.getValue();
         if (token.getType() == ADD)
         {
-            list.push_back(token.getValue());
+            //list.push_back(opVal);
             match(ADD);
         }
         else
         {
-            list.push_back(token.getValue());
+            //list.push_back(opVal);
             match(MULTIPLY);
         }
+        return opVal;
     }
 
 };
 
 #endif // PARSER_H
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// snap(D,Y,B,(E+C))
+//
+// D Y B ( E + C )
+//
+// D Y B ( E + ( A * B
+//
+//

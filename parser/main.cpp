@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     Parser parser = Parser(tokens, cout);
     try {
         DatalogProgram program = parser.parse();
-        cout << "Success!" << endl;
+        cout << "Success!" << endl << program.toString(); 
     } catch (Token error) {
         cout << "Failure! " << endl << error.toString();
     }
