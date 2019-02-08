@@ -300,12 +300,10 @@ public:
         std::string opVal = token.getValue();
         if (token.getType() == ADD)
         {
-            //list.push_back(opVal);
             match(ADD);
         }
         else
         {
-            //list.push_back(opVal);
             match(MULTIPLY);
         }
         return opVal;

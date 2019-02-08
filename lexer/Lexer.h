@@ -1,6 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
-#include "Token.h"
+#include "../lexer/Token.h"
 #include <cctype>
 #include <sstream>
 #include <vector>
