@@ -4,7 +4,6 @@
 #include "Predicate.h"
 #include "Rule.h"
 #include <sstream>
-
 #include <vector>
 
 class DatalogProgram
