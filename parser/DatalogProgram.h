@@ -44,8 +44,6 @@ public:
         return domains;
     }
 
-
-
     std::string schemesToString()
     {
         std::stringstream out;
