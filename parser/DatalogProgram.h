@@ -19,6 +19,33 @@ public:
     DatalogProgram(std::vector<Predicate> schemes, std::vector<Predicate> facts, std::vector<Rule> rules, std::vector<Predicate> queries, std::vector<std::string> domains)
         : schemes(schemes), facts(facts), rules(rules), queries(queries), domains(domains) {}
 
+    std::vector<Predicate> getSchemes()
+    {
+        return schemes;
+    }
+
+    std::vector<Predicate> getFacts()
+    {
+        return facts;
+    }
+
+    std::vector<Rule> getRules()
+    {
+        return rules;
+    }
+
+    std::vector<Predicate> getQueries()
+    {
+        return queries;
+    }
+
+    std::vector<std::string> getDomains()
+    {
+        return domains;
+    }
+
+
+
     std::string schemesToString()
     {
         std::stringstream out;
