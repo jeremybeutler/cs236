@@ -9,10 +9,15 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <set>
 #include "../lexer/Token.h"
 #include "../lexer/Lexer.h"
 #include "../parser/Parser.h"
 #include "Database.h"
+#include "Relation.h"
+#include "Scheme.h"
+#include "Scheme.h"
+#include "Tuple.h"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -26,11 +31,11 @@ int main(int argc, char *argv[])
     lexer.Tokenize();
     std::vector<Token> tokens = lexer.tokens();
     Parser parser = Parser(tokens, cout);
+    Database db;
     try {
         DatalogProgram p = parser.parse();
         cout << "Parser Success!" << std::endl << p.toString();
-        Database db = Database(p);
-
+        db = Database(p);
     } catch (Token error) {
         cout << "Parser Failure!" << std::endl << "  " << error.toString();
     }

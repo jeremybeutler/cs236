@@ -9,47 +9,47 @@
 class DatalogProgram
 {
 private:
-    std::vector<Predicate> schemes;
-    std::vector<Predicate> facts;
-    std::vector<Rule> rules;
-    std::vector<Predicate> queries;
-    std::vector<std::string> domains;
+    std::vector<Predicate> _schemes;
+    std::vector<Predicate> _facts;
+    std::vector<Rule> _rules;
+    std::vector<Predicate> _queries;
+    std::vector<std::string> _domain;
 public:
-    DatalogProgram(std::vector<Predicate> schemes, std::vector<Predicate> facts, std::vector<Rule> rules, std::vector<Predicate> queries, std::vector<std::string> domains)
-        : schemes(schemes), facts(facts), rules(rules), queries(queries), domains(domains) {}
+    DatalogProgram(std::vector<Predicate> _schemes, std::vector<Predicate> _facts, std::vector<Rule> _rules, std::vector<Predicate> _queries, std::vector<std::string> _domain)
+        : _schemes(_schemes), _facts(_facts), _rules(_rules), _queries(_queries), _domain(_domain) {}
 
-    std::vector<Predicate> getSchemes()
+    std::vector<Predicate> schemes()
     {
-        return schemes;
+        return _schemes;
     }
 
-    std::vector<Predicate> getFacts()
+    std::vector<Predicate> facts()
     {
-        return facts;
+        return _facts;
     }
 
-    std::vector<Rule> getRules()
+    std::vector<Rule> rules()
     {
-        return rules;
+        return _rules;
     }
 
-    std::vector<Predicate> getQueries()
+    std::vector<Predicate> queries()
     {
-        return queries;
+        return _queries;
     }
 
-    std::vector<std::string> getDomains()
+    std::vector<std::string> domain()
     {
-        return domains;
+        return _domain;
     }
 
     std::string schemesToString()
     {
         std::stringstream out;
-        out << "Schemes(" << schemes.size() << "):" << std::endl;
-        for (unsigned int i = 0; i < schemes.size(); i++)
+        out << "_schemes(" << _schemes.size() << "):" << std::endl;
+        for (unsigned int i = 0; i < _schemes.size(); i++)
         {
-          out << "  " << schemes.at(i).toString() << std::endl;
+          out << "  " << _schemes.at(i).toString() << std::endl;
         }
         return out.str();
     }
@@ -57,10 +57,10 @@ public:
     std::string factsToString()
     {
         std::stringstream out;
-        out << "Facts(" << facts.size() << "):" << std::endl;
-        for (unsigned int i = 0; i < facts.size(); i++)
+        out << "_facts(" << _facts.size() << "):" << std::endl;
+        for (unsigned int i = 0; i < _facts.size(); i++)
         {
-          out << "  " << facts.at(i).toString() << "." << std::endl;
+          out << "  " << _facts.at(i).toString() << "." << std::endl;
         }
         return out.str();
     }
@@ -68,10 +68,10 @@ public:
     std::string rulesToString()
     {
         std::stringstream out;
-        out << "Rules(" << rules.size() << "):" << std::endl;
-        for (unsigned int i = 0; i < rules.size(); i++)
+        out << "_rules(" << _rules.size() << "):" << std::endl;
+        for (unsigned int i = 0; i < _rules.size(); i++)
         {
-          out << "  " << rules.at(i).toString() << std::endl;
+          out << "  " << _rules.at(i).toString() << std::endl;
         }
         return out.str();
     }
@@ -79,10 +79,10 @@ public:
     std::string queriesToString()
     {
         std::stringstream out;
-        out << "Queries(" << queries.size() << "):" << std::endl;
-        for (unsigned int i = 0; i < queries.size(); i++)
+        out << "_queries(" << _queries.size() << "):" << std::endl;
+        for (unsigned int i = 0; i < _queries.size(); i++)
         {
-          out << "  " << queries.at(i).toString() << "?" << std::endl;
+          out << "  " << _queries.at(i).toString() << "?" << std::endl;
         }
         return out.str();
     }
@@ -90,10 +90,10 @@ public:
     std::string domainsToString()
     {
         std::stringstream out;
-        out << "Domain(" << domains.size() << "):" << std::endl;
-        for (unsigned int i = 0; i < domains.size(); i++)
+        out << "Domain(" << _domain.size() << "):" << std::endl;
+        for (unsigned int i = 0; i < _domain.size(); i++)
         {
-          out << "  " << domains.at(i) << std::endl;
+          out << "  " << _domain.at(i) << std::endl;
         }
         return out.str();
     }

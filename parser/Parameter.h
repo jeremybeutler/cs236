@@ -6,22 +6,32 @@
 class Parameter
 {
 private:
-    std::string type;
-    std::string param;
+    std::string _type;
+    std::string _value;
 
 public:
-    Parameter(std::string type, std::string param)
-      : type(type), param(param)  {}
+    Parameter(std::string _type, std::string _value)
+      : _type(_type), _value(_value)  {}
 
-	std::string toString()
-  {
-      std::stringstream out;
-      if (type == "STRING") out << param;
-      else if (type == "ID") out << param;
-      else if (type == "EXPRESSION") out << param;
+    std::string type()
+    {
+        return _type;
+    }
 
-      return out.str();
-  }
+    std::string value()
+    {
+        return _value;
+    }
+
+    std::string toString()
+    {
+        std::stringstream out;
+        if (_type == "STRING") out << _value;
+        else if (_type == "ID") out << _value;
+        else if (_type == "EXPRESSION") out << _value;
+
+        return out.str();
+    }
 };
 
 #endif // PARAMETER_H
