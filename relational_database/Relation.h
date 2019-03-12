@@ -19,6 +19,25 @@ public:
     Relation(std::string name, Scheme scheme, std::set<Tuple> tuples)
 			: name(name), scheme(scheme), tuples(tuples) {}
 
+    void addTuple(Tuple t)
+    {
+        tuples.insert(t);
+    }
+
+    std::string toString()
+    {
+        std::stringstream out;
+        for (Tuple tuple : tuples) 
+        {
+            for (unsigned int i = 0; i < scheme.size(); ++i)
+            {
+                out << scheme.at(i) << "=" << tuple.at(i);
+                out << ((i == scheme.size() - 1) ? ", " : "");
+            }
+            out << std::endl;
+        }
+        return out.str();
+    }
 };
 
 #endif // RELATION_H

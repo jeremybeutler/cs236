@@ -15,6 +15,7 @@ private:
     std::vector<Predicate> _queries;
     std::vector<std::string> _domain;
 public:
+    DatalogProgram() {}
     DatalogProgram(std::vector<Predicate> _schemes, std::vector<Predicate> _facts, std::vector<Rule> _rules, std::vector<Predicate> _queries, std::vector<std::string> _domain)
         : _schemes(_schemes), _facts(_facts), _rules(_rules), _queries(_queries), _domain(_domain) {}
 

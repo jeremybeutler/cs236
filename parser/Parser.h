@@ -241,20 +241,20 @@ public:
         std::string paramVal = token.getValue();
         if (token.getType() == STRING)
         {
-            Parameter p = Parameter("STRING", paramVal);
+            Parameter p = Parameter(true, paramVal);
             list.push_back(p);
             match(STRING);
         }
         else if (token.getType() == ID)
         {
-            Parameter p = Parameter("ID", paramVal);
+            Parameter p = Parameter(false, paramVal);
             list.push_back(p);
             match(ID);
         }
         else
         {
             paramVal = expression();
-            Parameter p = Parameter("EXPRESSION", paramVal);
+            Parameter p = Parameter(false, paramVal);
             list.push_back(p);
         }
         return paramVal;

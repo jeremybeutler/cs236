@@ -13,6 +13,7 @@
 #include "../lexer/Token.h"
 #include "../lexer/Lexer.h"
 #include "../parser/Parser.h"
+#include "Interpreter.h"
 #include "Database.h"
 #include "Relation.h"
 #include "Scheme.h"
@@ -31,11 +32,13 @@ int main(int argc, char *argv[])
     lexer.Tokenize();
     std::vector<Token> tokens = lexer.tokens();
     Parser parser = Parser(tokens, cout);
+    Interpreter i;
     Database db;
     try {
         DatalogProgram p = parser.parse();
         cout << "Parser Success!" << std::endl << p.toString();
-        db = Database(p);
+        i = Interpreter(p);
+        db = i.createDB();
     } catch (Token error) {
         cout << "Parser Failure!" << std::endl << "  " << error.toString();
     }

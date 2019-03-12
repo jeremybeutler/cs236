@@ -6,16 +6,16 @@
 class Parameter
 {
 private:
-    std::string _type;
+    bool _isConstant;
     std::string _value;
 
 public:
-    Parameter(std::string _type, std::string _value)
-      : _type(_type), _value(_value)  {}
+    Parameter(bool _isConstant, std::string _value)
+      : _isConstant(_isConstant), _value(_value)  {}
 
-    std::string type()
+    bool isConstant()
     {
-        return _type;
+        return _isConstant;
     }
 
     std::string value()
@@ -26,10 +26,7 @@ public:
     std::string toString()
     {
         std::stringstream out;
-        if (_type == "STRING") out << _value;
-        else if (_type == "ID") out << _value;
-        else if (_type == "EXPRESSION") out << _value;
-
+        out << _value;
         return out.str();
     }
 };
