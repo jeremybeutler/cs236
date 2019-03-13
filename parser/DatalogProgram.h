@@ -72,7 +72,7 @@ public:
         out << "_rules(" << _rules.size() << "):" << std::endl;
         for (unsigned int i = 0; i < _rules.size(); i++)
         {
-          out << "  " << _rules.at(i).toString() << std::endl;
+            out << "  " << _rules.at(i).toString() << std::endl;
         }
         return out.str();
     }
@@ -83,7 +83,7 @@ public:
         out << "_queries(" << _queries.size() << "):" << std::endl;
         for (unsigned int i = 0; i < _queries.size(); i++)
         {
-          out << "  " << _queries.at(i).toString() << "?" << std::endl;
+            out << "  " << _queries.at(i).toString() << "?" << std::endl;
         }
         return out.str();
     }

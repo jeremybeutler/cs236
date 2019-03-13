@@ -42,15 +42,24 @@ public:
     std::string toString()
     {
         std::stringstream out;
-        for (Tuple tuple : _tuples) 
+        if (_tuples.size())
         {
-            for (unsigned int i = 0; i < _scheme.size(); ++i)
+            out << "Yes(" << _tuples.size() << ")" << std::endl;
+            for (Tuple tuple : _tuples) 
             {
-                out << _scheme.at(i) << "=" << tuple.at(i);
-                out << ((i == _scheme.size() - 1) ? "" : ", ");
+                if (_scheme.size() == 0) break;
+                out << "  ";
+                for (unsigned int i = 0; i < _scheme.size(); ++i)
+                {
+                    out << _scheme.at(i) << "=" << tuple.at(i);
+                    out << ((i == _scheme.size() - 1) ? "" : ", ");
+                }
+                out << std::endl;
             }
-            out << std::endl;
         }
+        else 
+            out << "No" << std::endl;
+        
         return out.str();
     }
 };

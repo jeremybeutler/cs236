@@ -156,7 +156,7 @@ public:
         std::vector<Predicate> queries = p.queries();
         for (unsigned int i = 0; i < queries.size(); ++i)
         {
-            out << query(queries.at(i)).toString() << std::endl;
+            out << queries.at(i).toString() << "? " << query(queries.at(i)).toString();
         }
         return out.str();
     }
