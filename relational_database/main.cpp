@@ -32,15 +32,18 @@ int main(int argc, char *argv[])
     lexer.Tokenize();
     std::vector<Token> tokens = lexer.tokens();
     Parser parser = Parser(tokens, cout);
-    Interpreter i;
-    Database db;
+    DatalogProgram p;
     try {
-        DatalogProgram p = parser.parse();
-        cout << "Parser Success!" << std::endl << p.toString();
-        i = Interpreter(p);
-        db = i.createDB();
+        p = parser.parse();
+        //cout << "Parser Success!" << std::endl << p.toString();
+
     } catch (Token error) {
         cout << "Parser Failure!" << std::endl << "  " << error.toString();
     }
+
+    Interpreter i = Interpreter(p);
+    Database db = i.db();
+    cout << i.evaluateQueries();
+
 	return 0;
 }

@@ -10,29 +10,44 @@
 class Relation
 {
 private:
-    std::string name;
-    Scheme scheme;
-    std::set<Tuple> tuples; 
+    std::string _name;
+    Scheme _scheme;
+    std::set<Tuple> _tuples; 
     
 public:
-    Relation() : scheme() {}
-    Relation(std::string name, Scheme scheme, std::set<Tuple> tuples)
-			: name(name), scheme(scheme), tuples(tuples) {}
+    Relation() : _scheme() {}
+    Relation(std::string _name, Scheme _scheme, std::set<Tuple> _tuples)
+			: _name(_name), _scheme(_scheme), _tuples(_tuples) {}
+
+    std::string name()
+    {
+        return _name;
+    }
+    
+    Scheme scheme()
+    {
+        return _scheme;
+    }
+    
+    std::set<Tuple> tuples()
+    {
+        return _tuples;
+    }
 
     void addTuple(Tuple t)
     {
-        tuples.insert(t);
+        _tuples.insert(t);
     }
 
     std::string toString()
     {
         std::stringstream out;
-        for (Tuple tuple : tuples) 
+        for (Tuple tuple : _tuples) 
         {
-            for (unsigned int i = 0; i < scheme.size(); ++i)
+            for (unsigned int i = 0; i < _scheme.size(); ++i)
             {
-                out << scheme.at(i) << "=" << tuple.at(i);
-                out << ((i == scheme.size() - 1) ? ", " : "");
+                out << _scheme.at(i) << "=" << tuple.at(i);
+                out << ((i == _scheme.size() - 1) ? "" : ", ");
             }
             out << std::endl;
         }
