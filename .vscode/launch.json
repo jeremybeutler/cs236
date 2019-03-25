@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/relational_database/lab3",
+            "program": "${workspaceFolder}/relational_database/lab4",
             "args": ["${workspaceFolder}/relational_database/input.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

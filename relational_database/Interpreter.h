@@ -37,15 +37,12 @@ public:
             std::string name = schemes.at(i).id();
             Scheme s;
             std::set<Tuple> tuples;
-            
             // loop through each Parameter in the vector of Parameters in the scheme Predicate 
             for (unsigned int j = 0; j < schemes.at(i).listStr().size(); ++j)
-            {
                 s.push_back(schemes.at(i).listStr().at(j));
-            }
+
             // loop through each fact Predicate
             for (unsigned int j = 0; j < facts.size(); ++j)
-            {
                 if (facts.at(j).id() == name)
                 {
                     Tuple t;
@@ -56,8 +53,7 @@ public:
                     }
                     tuples.insert(t);
                 }
-                
-            }
+
             r = Relation(name, s, tuples);
             _db[name] = r;
         }
@@ -75,10 +71,9 @@ public:
         std::set<Tuple> tuples_old = r.tuples();
         Relation relation_new = Relation(r.name(), r.scheme(), std::set<Tuple>());        
         for (Tuple tuple : tuples_old) 
-        {
             if (tuple.at(pos) == val) 
                 relation_new.addTuple(tuple);
-        }
+
         return relation_new;
     }
 
@@ -86,31 +81,30 @@ public:
     {
         std::set<Tuple> tuples_old = r.tuples();
         Relation relation_new = Relation(r.name(), r.scheme(), std::set<Tuple>());
-        for (Tuple tuple : tuples_old) 
-        {
+        for (Tuple tuple : tuples_old)
             if (tuple.at(pos_1) == tuple.at(pos_2)) 
                 relation_new.addTuple(tuple);
-        }
+                
         return relation_new;
     }
 
-    Relation project(Relation& r, std::vector<int> indexes, std::vector<std::string> new_order = std::vector<std::string>())
+    Relation project(Relation& r, std::vector<int> indexes, std::vector<size_t> order = {})
     {
         Scheme scheme_old = r.scheme();
         std::set<Tuple> tuples_old = r.tuples();
         Scheme scheme_new;
-
         for (unsigned int i = 0; i < indexes.size(); ++i)
             scheme_new.push_back(scheme_old.at(indexes.at(i)));
-
+        
+        if (!(order.empty())) reorder(scheme_new, order);
         Relation relation_new = Relation(r.name(), scheme_new, std::set<Tuple>());
-
         for (Tuple tuple : tuples_old) 
         {
             Tuple tuple_new;
             for (unsigned int i = 0; i < indexes.size(); ++i)
                 tuple_new.push_back(tuple.at(indexes.at(i)));
 
+            if (!(order.empty())) reorder(tuple_new, order);
             relation_new.addTuple(tuple_new);
         }
         return relation_new;
@@ -122,22 +116,28 @@ public:
         return relation_new;
     }
 
-    Relation join (std::string name, Relation r1, Relation r2)
+    Relation join(std::string name, Relation r1, Relation r2)
     {
-        vector<int> duplicateIndexes;
+        std::vector<int> duplicateIndexes;
         Scheme scheme_new = combineSchemes(r1.scheme(), r2.scheme(), duplicateIndexes);
         Relation relation_new = Relation(name, scheme_new, std::set<Tuple>());
-        for (Tuple t1 : r1.tuples()) 
-        {
+        for (Tuple t1 : r1.tuples())
             for (Tuple t2 : r2.tuples())
-            {
                 if (isJoinable(t1, t2, r1.scheme(), r2.scheme()))
-                    combineTuples(t1, t2, duplicateIndexes);
-            }
-        }
+                    relation_new.addTuple(combineTuples(t1, t2, duplicateIndexes));
+
+        return relation_new;
     }
 
-    // Helper methods    
+    // Helper methods
+    
+    template<class T>
+    void reorder(std::vector<T>& in, const std::vector<size_t>& order)  
+    {    
+        std::vector<T> copy = in;
+        for(unsigned int i = 0; i < order.size(); ++i)  
+            in[i] = copy[ order[i] ];  
+    }
 
     bool isJoinable(Tuple t1, Tuple t2, Scheme s1, Scheme s2)
     {
@@ -146,10 +146,10 @@ public:
         {
             v1 = t1.at(i);
             n1 = s1.at(i);
-            for (unsigned int j = 0; i < t2.size(); ++j)
+            for (unsigned int j = 0; j < t2.size(); ++j)
             {
-                v2 = t2.at(i);
-                n2 = s2.at(i);
+                v2 = t2.at(j);
+                n2 = s2.at(j);
                 if (n1 == n2 && v1 != v2)
                     return false;
             }
@@ -158,7 +158,7 @@ public:
 
     }
 
-    Tuple combineTuples(Tuple t1, Tuple t2, vector<int> duplicateIndexes)
+    Tuple combineTuples(Tuple t1, Tuple t2, std::vector<int> duplicateIndexes)
     {
         Tuple tuple_new;
         for (unsigned int i = 0; i < t1.size(); ++i)
@@ -167,16 +167,18 @@ public:
         for (unsigned int i = 0; i < t2.size(); ++i)
             if (!(std::find(duplicateIndexes.begin(), duplicateIndexes.end(), i) != duplicateIndexes.end()))
                 tuple_new.push_back(t2.at(i));
+        
+        return tuple_new;
     }
 
-    Scheme combineSchemes(Scheme s1, Scheme s2, vector<int>& duplicateIndexes)
+    Scheme combineSchemes(Scheme s1, Scheme s2, std::vector<int>& duplicateIndexes)
     {
         Scheme scheme_new;
         for (unsigned int i = 0; i < s1.size(); ++i)
             scheme_new.push_back(s1.at(i));
 
         for (unsigned int i = 0; i < s2.size(); ++i)
-            if (!(count(scheme_new.begin(), scheme_new.end(), s2.at(i))))
+            if (!(count(scheme_new.begin(), scheme_new.end(), s2.at(i)))) 
                 scheme_new.push_back(s2.at(i));
             else
                 duplicateIndexes.push_back(i);

@@ -35,7 +35,6 @@ int main(int argc, char *argv[])
     DatalogProgram p;
     try {
         p = parser.parse();
-        //cout << "Parser Success!" << std::endl << p.toString();
 
     } catch (Token error) {
         cout << "Parser Failure!" << std::endl << "  " << error.toString();
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
 
     Interpreter i = Interpreter(p);
     Database db = i.db();
-    cout << i.evaluateQueries();
+    //cout << i.evaluateQueries();
 
 	return 0;
 }
