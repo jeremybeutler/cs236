@@ -68,6 +68,8 @@ public:
         return _db;
     }
 
+    // Database methods
+
     Relation selectA(Relation& r, std::string val, int pos)
     {
         std::set<Tuple> tuples_old = r.tuples();
@@ -119,6 +121,70 @@ public:
         Relation relation_new = Relation(r.name(), scheme_new, r.tuples());
         return relation_new;
     }
+
+    Relation join (std::string name, Relation r1, Relation r2)
+    {
+        vector<int> duplicateIndexes;
+        Scheme scheme_new = combineSchemes(r1.scheme(), r2.scheme(), duplicateIndexes);
+        Relation relation_new = Relation(name, scheme_new, std::set<Tuple>());
+        for (Tuple t1 : r1.tuples()) 
+        {
+            for (Tuple t2 : r2.tuples())
+            {
+                if (isJoinable(t1, t2, r1.scheme(), r2.scheme()))
+                    combineTuples(t1, t2, duplicateIndexes);
+            }
+        }
+    }
+
+    // Helper methods    
+
+    bool isJoinable(Tuple t1, Tuple t2, Scheme s1, Scheme s2)
+    {
+        std::string v1, v2, n1, n2;
+        for (unsigned int i = 0; i < t1.size(); ++i)
+        {
+            v1 = t1.at(i);
+            n1 = s1.at(i);
+            for (unsigned int j = 0; i < t2.size(); ++j)
+            {
+                v2 = t2.at(i);
+                n2 = s2.at(i);
+                if (n1 == n2 && v1 != v2)
+                    return false;
+            }
+        }
+        return true;
+
+    }
+
+    Tuple combineTuples(Tuple t1, Tuple t2, vector<int> duplicateIndexes)
+    {
+        Tuple tuple_new;
+        for (unsigned int i = 0; i < t1.size(); ++i)
+            tuple_new.push_back(t1.at(i));
+        
+        for (unsigned int i = 0; i < t2.size(); ++i)
+            if (!(std::find(duplicateIndexes.begin(), duplicateIndexes.end(), i) != duplicateIndexes.end()))
+                tuple_new.push_back(t2.at(i));
+    }
+
+    Scheme combineSchemes(Scheme s1, Scheme s2, vector<int>& duplicateIndexes)
+    {
+        Scheme scheme_new;
+        for (unsigned int i = 0; i < s1.size(); ++i)
+            scheme_new.push_back(s1.at(i));
+
+        for (unsigned int i = 0; i < s2.size(); ++i)
+            if (!(count(scheme_new.begin(), scheme_new.end(), s2.at(i))))
+                scheme_new.push_back(s2.at(i));
+            else
+                duplicateIndexes.push_back(i);
+
+        return scheme_new;
+    }
+    
+    // Datalog Language methods
 
     Relation query(Predicate p)
     {
