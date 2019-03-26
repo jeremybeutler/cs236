@@ -129,6 +129,15 @@ public:
         return relation_new;
     }
 
+    Relation unite(Relation& r1)
+    {
+        Relation r2 = _db[r1.name()];
+        for (Tuple t : r1.tuples())
+            if (!(r2.tuples.count(t))) r2.addTuple(t);
+
+        _db[r1.name] = r2;
+    }
+
     // Helper methods
     
     template<class T>
@@ -191,7 +200,7 @@ public:
     Relation query(Predicate p)
     {
         std::string name = p.id();
-        Relation r = db()[name];
+        Relation r = _db[name];
         std::vector<Parameter> param_list = p.list();
         std::vector<std::string> query_vars;
         Scheme scheme_new;
