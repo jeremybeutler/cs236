@@ -88,7 +88,7 @@ public:
         return relation_new;
     }
 
-    Relation project(Relation& r, std::vector<int> indexes, std::vector<size_t> order = {})
+    Relation project(Relation& r, std::vector<int> indexes, std::vector<int> order = {})
     {
         Scheme scheme_old = r.scheme();
         std::set<Tuple> tuples_old = r.tuples();
@@ -116,11 +116,11 @@ public:
         return relation_new;
     }
 
-    Relation join(std::string name, Relation r1, Relation r2)
+    Relation join(Relation r1, Relation r2)
     {
         std::vector<int> duplicateIndexes;
         Scheme scheme_new = combineSchemes(r1.scheme(), r2.scheme(), duplicateIndexes);
-        Relation relation_new = Relation(name, scheme_new, std::set<Tuple>());
+        Relation relation_new = Relation(r1.name(), scheme_new, std::set<Tuple>());
         for (Tuple t1 : r1.tuples())
             for (Tuple t2 : r2.tuples())
                 if (isJoinable(t1, t2, r1.scheme(), r2.scheme()))
@@ -129,19 +129,24 @@ public:
         return relation_new;
     }
 
-    Relation unite(Relation& r1)
+    void unite(Relation& r1)
     {
+        std::stringstream out;
         Relation r2 = _db[r1.name()];
         for (Tuple t : r1.tuples())
-            if (!(r2.tuples.count(t))) r2.addTuple(t);
-
-        _db[r1.name] = r2;
+        {
+            if (!(r2.tuples.count(t)))
+            {
+                r2.addTuple(t);
+            }
+        }
+        _db[r1.name()] = r2;
     }
 
     // Helper methods
     
     template<class T>
-    void reorder(std::vector<T>& in, const std::vector<size_t>& order)  
+    void reorder(std::vector<T>& in, const std::vector<int>& order)  
     {    
         std::vector<T> copy = in;
         for(unsigned int i = 0; i < order.size(); ++i)  
@@ -194,6 +199,16 @@ public:
 
         return scheme_new;
     }
+
+    int countTuples()
+    {
+        int count = 0;
+        for (const auto& pair : _db) {
+            Relation r = pair.second;
+            for (Tuple t : r.tuples())
+                ++count;
+        }
+    }
     
     // Datalog Language methods
 
@@ -204,7 +219,7 @@ public:
         std::vector<Parameter> param_list = p.list();
         std::vector<std::string> query_vars;
         Scheme scheme_new;
-        std::vector<int> kept_column_indexes;
+        std::vector<int> indexes;
         for (unsigned int i = 0; i < param_list.size(); ++i)
         {
             std::string param_val = param_list.at(i).value();
@@ -219,10 +234,10 @@ public:
             {
                 query_vars.push_back(param_val);
                 scheme_new.push_back(param_val);
-                kept_column_indexes.push_back(i);
+                indexes.push_back(i);
             }
         }
-        r = project(r, kept_column_indexes);
+        r = project(r, indexes);
         r = rename(r, scheme_new);
         return r;
     }
@@ -236,6 +251,49 @@ public:
             out << queries.at(i).toString() << "? " << query(queries.at(i)).toString();
         }
         return out.str();
+    }
+
+    std::string EvaluateRule(Rule r)
+    {
+        Relation r_old = _db[r.predicateHead().id()];
+        Relation r_new = Relation(r.predicateHead().id(), Scheme(), std::set<Tuple>());
+        Relation r_temp;
+        std::vector<std::string> param_list_str = r.predicateHead().listStr();
+        if (!(r.predicateList().size() == 1))
+            for (unsigned int i = 0; i < r.predicateList().size(); ++i)
+            {
+                r_temp = query(r.predicateList().at(i));
+                r_new = join(r_new, r_temp);
+            }
+        std::vector<int> indexes, order;
+        int count = 0;
+        for (unsigned int i = 0; i < r_new.scheme().size(); ++i)
+        {
+            auto it = std::find(param_list_str.begin(), param_list_str.end(), r_new.scheme().at(i));
+            if (it != param_list_str.end())
+            {
+                order.push_back(count);
+                indexes.push_back(std::distance(param_list_str.begin(), it));
+                ++count;
+            }
+        }
+        r_new = project(r_new, indexes, order);
+        unite(r_new);
+    }
+
+    std::string EvaluateRules()
+    {
+        std::vector<Rule> rules = p.rules();
+        int pre_count, post_count;
+        do 
+        {
+            pre_count = countTuples();
+            for (unsigned int i = 0; i < rules.size(); ++i)
+                EvaluateRule(rules.at(i));
+
+            post_count = countTuples();
+        } 
+        while (pre_count != post_count);
     }
 
 };
