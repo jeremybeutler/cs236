@@ -5,6 +5,7 @@
 #include <sstream>
 #include <set>
 #include <algorithm>
+#include <sstream>
 #include "Database.h"
 #include "../parser/DatalogProgram.h"
 
@@ -96,7 +97,7 @@ public:
         for (unsigned int i = 0; i < indexes.size(); ++i)
             scheme_new.push_back(scheme_old.at(indexes.at(i)));
         
-        if (!(order.empty())) reorder(scheme_new, order);
+        // if (!(order.empty())) reorder(scheme_new, order);
         Relation relation_new = Relation(r.name(), scheme_new, std::set<Tuple>());
         for (Tuple tuple : tuples_old) 
         {
@@ -104,7 +105,7 @@ public:
             for (unsigned int i = 0; i < indexes.size(); ++i)
                 tuple_new.push_back(tuple.at(indexes.at(i)));
 
-            if (!(order.empty())) reorder(tuple_new, order);
+            // if (!(order.empty())) reorder(tuple_new, order);
             relation_new.addTuple(tuple_new);
         }
         return relation_new;
@@ -116,15 +117,28 @@ public:
         return relation_new;
     }
 
-    Relation join(Relation r1, Relation r2)
+    Relation join(Relation r1, Relation r2, std::ostream& out)
     {
+        if (r1.tuples().empty()) return r2;
+        else if (r2.tuples().empty()) return r1;
+
         std::vector<int> duplicateIndexes;
         Scheme scheme_new = combineSchemes(r1.scheme(), r2.scheme(), duplicateIndexes);
         Relation relation_new = Relation(r1.name(), scheme_new, std::set<Tuple>());
         for (Tuple t1 : r1.tuples())
             for (Tuple t2 : r2.tuples())
                 if (isJoinable(t1, t2, r1.scheme(), r2.scheme()))
-                    relation_new.addTuple(combineTuples(t1, t2, duplicateIndexes));
+                {
+                    Tuple t_new = combineTuples(t1, t2, duplicateIndexes);
+                    relation_new.addTuple(t_new);
+                    out << "  ";
+                    for (unsigned int i = 0; i < relation_new.scheme().size(); ++i)
+                    {
+                        out << relation_new.scheme().at(i) << "=" << t_new.at(i);
+                        out << ((i == relation_new.scheme().size() - 1) ? "" : ", ");
+                    }
+                    out << std::endl;
+                }
 
         return relation_new;
     }
@@ -135,7 +149,7 @@ public:
         Relation r2 = _db[r1.name()];
         for (Tuple t : r1.tuples())
         {
-            if (!(r2.tuples.count(t)))
+            if (!(r2.tuples().count(t)))
             {
                 r2.addTuple(t);
             }
@@ -208,6 +222,7 @@ public:
             for (Tuple t : r.tuples())
                 ++count;
         }
+        return count;
     }
     
     // Datalog Language methods
@@ -245,6 +260,7 @@ public:
     std::string evaluateQueries()
     {
         std::stringstream out;
+        out << "Query Evaluation" << std::endl;
         std::vector<Predicate> queries = p.queries();
         for (unsigned int i = 0; i < queries.size(); ++i)
         {
@@ -255,6 +271,7 @@ public:
 
     std::string EvaluateRule(Rule r)
     {
+        std::stringstream out;
         Relation r_old = _db[r.predicateHead().id()];
         Relation r_new = Relation(r.predicateHead().id(), Scheme(), std::set<Tuple>());
         Relation r_temp;
@@ -263,7 +280,7 @@ public:
             for (unsigned int i = 0; i < r.predicateList().size(); ++i)
             {
                 r_temp = query(r.predicateList().at(i));
-                r_new = join(r_new, r_temp);
+                r_new = join(r_new, r_temp, out);
             }
         std::vector<int> indexes, order;
         int count = 0;
@@ -277,23 +294,51 @@ public:
                 ++count;
             }
         }
-        r_new = project(r_new, indexes, order);
+        r_new = project(r_new, indexes);
         unite(r_new);
+        return out.str();
     }
 
     std::string EvaluateRules()
     {
+        std::stringstream out;
+        out << "Rule Evaluation" << std::endl;
         std::vector<Rule> rules = p.rules();
         int pre_count, post_count;
+        int loop_count = 0;
         do 
         {
+            loop_count++;
             pre_count = countTuples();
             for (unsigned int i = 0; i < rules.size(); ++i)
-                EvaluateRule(rules.at(i));
-
+            {
+                out << rules.at(i).predicateHead().id() << "(";
+                for (unsigned int j = 0; j < rules.at(i).predicateHead().listStr().size(); ++j)
+                {
+                    out << rules.at(i).predicateHead().listStr().at(j);
+                    if (j < (rules.at(i).predicateHead().listStr().size() - 1)) out << ",";
+                }
+                out << ") :- ";
+                for (unsigned int j = 0; j < rules.at(i).predicateList().size(); ++j)
+                {
+                    out << rules.at(i).predicateList().at(j).id() << "(";
+                    for (unsigned int k = 0; k < rules.at(i).predicateList().at(j).list().size(); ++k)
+                    {
+                        out << rules.at(i).predicateList().at(j).list().at(k).value();
+                        if (k < (rules.at(i).predicateList().at(j).list().size() - 1)) out << ",";
+                    }
+                    out << ")";
+                    if (j < (rules.at(i).predicateList().size() - 1)) out << ",";
+                }
+                out << "." << std::endl;
+                out << EvaluateRule(rules.at(i));
+            }
             post_count = countTuples();
         } 
         while (pre_count != post_count);
+        
+        out << "Schemes populated after " << loop_count << " passes through the Rules" << std::endl;
+        return out.str();
     }
 
 };

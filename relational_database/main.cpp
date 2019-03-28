@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
 
     Interpreter i = Interpreter(p);
     Database db = i.db();
-    //cout << i.evaluateQueries();
+    cout << i.EvaluateRules() << std::endl;
+    cout << i.evaluateQueries();
 
 	return 0;
 }
