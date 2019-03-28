@@ -117,41 +117,49 @@ public:
         return relation_new;
     }
 
-    Relation join(Relation r1, Relation r2, std::ostream& out)
+    Relation join(Relation r1, Relation r2)
     {
-        if (r1.tuples().empty()) return r2;
-        else if (r2.tuples().empty()) return r1;
-
         std::vector<int> duplicateIndexes;
         Scheme scheme_new = combineSchemes(r1.scheme(), r2.scheme(), duplicateIndexes);
         Relation relation_new = Relation(r1.name(), scheme_new, std::set<Tuple>());
+        if (r1.tuples().empty()) 
+        {
+            relation_new.setTuples(r2.tuples());
+            return relation_new;
+        }
+        // std::cout << "START JOIN" << std::endl;
         for (Tuple t1 : r1.tuples())
             for (Tuple t2 : r2.tuples())
+            {
+                // std::cout << "START isJoinable" << std::endl;
                 if (isJoinable(t1, t2, r1.scheme(), r2.scheme()))
                 {
-                    Tuple t_new = combineTuples(t1, t2, duplicateIndexes);
-                    relation_new.addTuple(t_new);
-                    out << "  ";
-                    for (unsigned int i = 0; i < relation_new.scheme().size(); ++i)
-                    {
-                        out << relation_new.scheme().at(i) << "=" << t_new.at(i);
-                        out << ((i == relation_new.scheme().size() - 1) ? "" : ", ");
-                    }
-                    out << std::endl;
+                    // std::cout << "END isJoinable" << std::endl;
+                    // std::cout << "START combineTuples" << std::endl;
+                    relation_new.addTuple(combineTuples(t1, t2, duplicateIndexes));
+                    // std::cout << "END combineTuples" << std::endl;
                 }
+            }
 
+        // std::cout << "END JOIN" << std::endl;
         return relation_new;
     }
 
-    void unite(Relation& r1)
+    void unite(Relation& r1, std::ostream& out)
     {
-        std::stringstream out;
         Relation r2 = _db[r1.name()];
         for (Tuple t : r1.tuples())
         {
             if (!(r2.tuples().count(t)))
             {
                 r2.addTuple(t);
+                out << "  ";
+                for (unsigned int i = 0; i < r2.scheme().size(); ++i)
+                {
+                    out << r2.scheme().at(i) << "=" << t.at(i);
+                    out << ((i == r2.scheme().size() - 1) ? "" : ", ");
+                }
+                out << std::endl;
             }
         }
         _db[r1.name()] = r2;
@@ -169,16 +177,16 @@ public:
 
     bool isJoinable(Tuple t1, Tuple t2, Scheme s1, Scheme s2)
     {
-        std::string v1, v2, n1, n2;
+        // std::string v1, v2, n1, n2;
         for (unsigned int i = 0; i < t1.size(); ++i)
         {
-            v1 = t1.at(i);
-            n1 = s1.at(i);
+            // v1 = t1.at(i);
+            // n1 = s1.at(i);
             for (unsigned int j = 0; j < t2.size(); ++j)
             {
-                v2 = t2.at(j);
-                n2 = s2.at(j);
-                if (n1 == n2 && v1 != v2)
+                // v2 = t2.at(j);
+                // n2 = s2.at(j);
+                if (s1.at(i) == s2.at(j) && t1.at(i) != t2.at(j))
                     return false;
             }
         }
@@ -276,26 +284,24 @@ public:
         Relation r_new = Relation(r.predicateHead().id(), Scheme(), std::set<Tuple>());
         Relation r_temp;
         std::vector<std::string> param_list_str = r.predicateHead().listStr();
-        if (!(r.predicateList().size() == 1))
-            for (unsigned int i = 0; i < r.predicateList().size(); ++i)
-            {
-                r_temp = query(r.predicateList().at(i));
-                r_new = join(r_new, r_temp, out);
-            }
-        std::vector<int> indexes, order;
-        int count = 0;
-        for (unsigned int i = 0; i < r_new.scheme().size(); ++i)
+        for (unsigned int i = 0; i < r.predicateList().size(); ++i)
         {
-            auto it = std::find(param_list_str.begin(), param_list_str.end(), r_new.scheme().at(i));
-            if (it != param_list_str.end())
+            r_temp = query(r.predicateList().at(i));
+            r_new = join(r_new, r_temp);
+        }
+        std::vector<int> indexes, order;
+        std::vector<std::string> r_new_vect = r_new.scheme();
+        int count = 0;
+        if (!(r_new_vect.empty()))
+            for (unsigned int i = 0; i < param_list_str.size(); ++i)
             {
+                auto it = std::find(r_new_vect.begin(), r_new_vect.end(), param_list_str.at(i));
                 order.push_back(count);
-                indexes.push_back(std::distance(param_list_str.begin(), it));
+                indexes.push_back(std::distance(r_new_vect.begin(), it));
                 ++count;
             }
-        }
         r_new = project(r_new, indexes);
-        unite(r_new);
+        unite(r_new, out);
         return out.str();
     }
 
@@ -337,10 +343,9 @@ public:
         } 
         while (pre_count != post_count);
         
-        out << "Schemes populated after " << loop_count << " passes through the Rules" << std::endl;
+        out << std::endl << "Schemes populated after " << loop_count << " passes through the Rules." << std::endl;
         return out.str();
     }
-
 };
 
 #endif // INTERPRETER_H

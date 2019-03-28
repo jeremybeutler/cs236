@@ -34,6 +34,21 @@ public:
         return _tuples;
     }
 
+    void setName(std::string name)
+    {
+        this->_name = name;
+    }
+
+    void setScheme(Scheme scheme)
+    {
+        this->_scheme = scheme;
+    }
+
+    void setTuples(std::set<Tuple> tuples)
+    {
+        this->_tuples = tuples;
+    }
+
     void addTuple(Tuple t)
     {
         _tuples.insert(t);
