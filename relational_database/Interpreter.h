@@ -8,6 +8,8 @@
 #include <sstream>
 #include "Database.h"
 #include "../parser/DatalogProgram.h"
+#include "../graph/Graph.h"
+#include "../graph/Node.h"
 
 class Interpreter
 {
@@ -27,9 +29,6 @@ public:
     {
         std::vector<Predicate> schemes = p.schemes();
         std::vector<Predicate> facts = p.facts();
-        // std::vector<Rule> rules = p.rules();
-        // std::vector<Predicate> queries = p.queries();
-        // std::vector<std::string> domains = p.domain();
 
         // loop through each scheme Predicate
         for (unsigned int i = 0; i < schemes.size(); ++i)
@@ -105,7 +104,6 @@ public:
             for (unsigned int i = 0; i < indexes.size(); ++i)
                 tuple_new.push_back(tuple.at(indexes.at(i)));
 
-            // if (!(order.empty())) reorder(tuple_new, order);
             relation_new.addTuple(tuple_new);
         }
         return relation_new;
@@ -127,21 +125,15 @@ public:
             relation_new.setTuples(r2.tuples());
             return relation_new;
         }
-        // std::cout << "START JOIN" << std::endl;
         for (Tuple t1 : r1.tuples())
             for (Tuple t2 : r2.tuples())
             {
-                // std::cout << "START isJoinable" << std::endl;
                 if (isJoinable(t1, t2, r1.scheme(), r2.scheme()))
                 {
-                    // std::cout << "END isJoinable" << std::endl;
-                    // std::cout << "START combineTuples" << std::endl;
                     relation_new.addTuple(combineTuples(t1, t2, duplicateIndexes));
-                    // std::cout << "END combineTuples" << std::endl;
                 }
             }
 
-        // std::cout << "END JOIN" << std::endl;
         return relation_new;
     }
 
@@ -177,15 +169,10 @@ public:
 
     bool isJoinable(Tuple t1, Tuple t2, Scheme s1, Scheme s2)
     {
-        // std::string v1, v2, n1, n2;
         for (unsigned int i = 0; i < t1.size(); ++i)
         {
-            // v1 = t1.at(i);
-            // n1 = s1.at(i);
             for (unsigned int j = 0; j < t2.size(); ++j)
             {
-                // v2 = t2.at(j);
-                // n2 = s2.at(j);
                 if (s1.at(i) == s2.at(j) && t1.at(i) != t2.at(j))
                     return false;
             }
@@ -280,26 +267,27 @@ public:
     std::string EvaluateRule(Rule r)
     {
         std::stringstream out;
-        Relation r_old = _db[r.predicateHead().id()];
         Relation r_new = Relation(r.predicateHead().id(), Scheme(), std::set<Tuple>());
         Relation r_temp;
         std::vector<std::string> param_list_str = r.predicateHead().listStr();
+        std::vector<int> indexes;
+        int count = 0;
+
         for (unsigned int i = 0; i < r.predicateList().size(); ++i)
         {
             r_temp = query(r.predicateList().at(i));
             r_new = join(r_new, r_temp);
         }
-        std::vector<int> indexes, order;
+
         std::vector<std::string> r_new_vect = r_new.scheme();
-        int count = 0;
         if (!(r_new_vect.empty()))
             for (unsigned int i = 0; i < param_list_str.size(); ++i)
             {
                 auto it = std::find(r_new_vect.begin(), r_new_vect.end(), param_list_str.at(i));
-                order.push_back(count);
                 indexes.push_back(std::distance(r_new_vect.begin(), it));
                 ++count;
             }
+
         r_new = project(r_new, indexes);
         unite(r_new, out);
         return out.str();
@@ -318,34 +306,33 @@ public:
             pre_count = countTuples();
             for (unsigned int i = 0; i < rules.size(); ++i)
             {
-                out << rules.at(i).predicateHead().id() << "(";
-                for (unsigned int j = 0; j < rules.at(i).predicateHead().listStr().size(); ++j)
-                {
-                    out << rules.at(i).predicateHead().listStr().at(j);
-                    if (j < (rules.at(i).predicateHead().listStr().size() - 1)) out << ",";
-                }
-                out << ") :- ";
-                for (unsigned int j = 0; j < rules.at(i).predicateList().size(); ++j)
-                {
-                    out << rules.at(i).predicateList().at(j).id() << "(";
-                    for (unsigned int k = 0; k < rules.at(i).predicateList().at(j).list().size(); ++k)
-                    {
-                        out << rules.at(i).predicateList().at(j).list().at(k).value();
-                        if (k < (rules.at(i).predicateList().at(j).list().size() - 1)) out << ",";
-                    }
-                    out << ")";
-                    if (j < (rules.at(i).predicateList().size() - 1)) out << ",";
-                }
-                out << "." << std::endl;
+                out << rules.at(i).toString() << std::endl;
                 out << EvaluateRule(rules.at(i));
             }
             post_count = countTuples();
-        } 
+        }
         while (pre_count != post_count);
         
         out << std::endl << "Schemes populated after " << loop_count << " passes through the Rules." << std::endl;
         return out.str();
     }
+
+    Graph buildDependencyGraph(const std::vector<Rule>& rules)
+    {
+        // for each rule (r1)
+        for (unsigned int i = 0; i < rules.size(); ++i)
+        {
+            Node n = Node(rules.at(i).predicateHead().id());
+            // for each body predicate (p) in r1 
+            for (unsigned int j = 0; j < rules.at(i).predicateList().size(); ++j)
+                // for each rule (r2)
+                for (unsigned int k = 0; k < rules.size(); ++k)
+                    // if p.name == r2.head.name, add edge from r1 to r2
+                    if (rules.at(i).predicateList().at(j).id() == rules.at(j).predicateHead().id())
+        }
+
+
+    } 
 };
 
 #endif // INTERPRETER_H

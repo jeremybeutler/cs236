@@ -13,17 +13,17 @@ public:
     Parameter(bool _isConstant, std::string _value)
       : _isConstant(_isConstant), _value(_value)  {}
 
-    bool isConstant()
+    bool isConstant() const
     {
         return _isConstant;
     }
 
-    std::string value()
+    std::string value() const
     {
         return _value;
     }
 
-    std::string toString()
+    std::string toString() const
     {
         std::stringstream out;
         out << _value;

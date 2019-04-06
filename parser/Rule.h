@@ -12,20 +12,21 @@ private:
 	Predicate _predicateHead;
     std::vector<Predicate> _predicateList;
 public:
+	Rule() {}
     Rule(Predicate _predicateHead, std::vector<Predicate> _predicateList)
 		: _predicateHead(_predicateHead), _predicateList(_predicateList) {}
 
-	Predicate predicateHead()
+	Predicate predicateHead() const
 	{
 		return _predicateHead;
 	}
 
-	std::vector<Predicate> predicateList()
+	std::vector<Predicate> predicateList() const
 	{
 		return _predicateList;
 	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		std::stringstream out;
 		out << _predicateHead.toString() << " :- ";

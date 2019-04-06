@@ -19,32 +19,32 @@ public:
     DatalogProgram(std::vector<Predicate> _schemes, std::vector<Predicate> _facts, std::vector<Rule> _rules, std::vector<Predicate> _queries, std::vector<std::string> _domain)
         : _schemes(_schemes), _facts(_facts), _rules(_rules), _queries(_queries), _domain(_domain) {}
 
-    std::vector<Predicate> schemes()
+    std::vector<Predicate> schemes() const
     {
         return _schemes;
     }
 
-    std::vector<Predicate> facts()
+    std::vector<Predicate> facts() const
     {
         return _facts;
     }
 
-    std::vector<Rule> rules()
+    std::vector<Rule> rules() const
     {
         return _rules;
     }
 
-    std::vector<Predicate> queries()
+    std::vector<Predicate> queries() const
     {
         return _queries;
     }
 
-    std::vector<std::string> domain()
+    std::vector<std::string> domain() const
     {
         return _domain;
     }
 
-    std::string schemesToString()
+    std::string schemesToString() const
     {
         std::stringstream out;
         out << "_schemes(" << _schemes.size() << "):" << std::endl;
@@ -55,7 +55,7 @@ public:
         return out.str();
     }
 
-    std::string factsToString()
+    std::string factsToString() const
     {
         std::stringstream out;
         out << "_facts(" << _facts.size() << "):" << std::endl;
@@ -66,7 +66,7 @@ public:
         return out.str();
     }
 
-    std::string rulesToString()
+    std::string rulesToString() const
     {
         std::stringstream out;
         out << "_rules(" << _rules.size() << "):" << std::endl;
@@ -77,7 +77,7 @@ public:
         return out.str();
     }
 
-    std::string queriesToString()
+    std::string queriesToString() const
     {
         std::stringstream out;
         out << "_queries(" << _queries.size() << "):" << std::endl;
@@ -88,7 +88,7 @@ public:
         return out.str();
     }
 
-    std::string domainsToString()
+    std::string domainsToString() const
     {
         std::stringstream out;
         out << "Domain(" << _domain.size() << "):" << std::endl;
@@ -99,7 +99,7 @@ public:
         return out.str();
     }
 
-    std::string toString()
+    std::string toString() const
     {
         std::stringstream out;
         out << schemesToString() << factsToString() << rulesToString() << queriesToString() << domainsToString();

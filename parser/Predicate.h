@@ -14,30 +14,31 @@ private:
 	std::vector<Parameter> _list;
 	std::vector<std::string> _listStr;
 public:
+	Predicate() {}
     Predicate(std::string _type, std::string _id, std::vector<Parameter> _list, std::vector<std::string> _listStr)
 			: _type(_type), _id(_id), _list(_list), _listStr(_listStr) {}
 
-    std::string type()
+    std::string type() const
 	{
 		return _type;
 	}
 
-	std::string id()
+	std::string id() const
 	{
 		return _id;
 	}
 
-	std::vector<Parameter> list()
+	std::vector<Parameter> list() const
 	{
 		return _list;
 	}
 
-	std::vector<std::string> listStr()
+	std::vector<std::string> listStr() const
 	{
 		return _listStr;
 	}	
 
-	std::string toString()
+	std::string toString() const
     {
         std::stringstream out;
 		if (_type == "PREDICATE")
