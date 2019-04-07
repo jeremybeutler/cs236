@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	//	Create input stream from argv[1] and output stream to argv[2]
 
 	ifstream in(argv[1]);
-    Lexer lexer = Lexer(in, cout);
+    Lexer lexer = Lexer(in/*, cout*/);
     lexer.Tokenize();
     std::vector<Token> tokens = lexer.tokens();
     Parser parser = Parser(tokens, cout);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     Interpreter i = Interpreter(p);
     Database db = i.db();
-    cout << i.EvaluateRules() << std::endl;
+    cout << i.evaluateRules() << std::endl;
     cout << i.evaluateQueries();
 
 	return 0;

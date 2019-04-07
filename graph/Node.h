@@ -8,17 +8,49 @@
 class Node
 {
 private:
-    std::string name;
-    std::set<int> adjacentNodes;
-    bool visit;
-    // postorder
+    int _id;
+    std::string _name;
+    std::set<int> _adjacentNodes;
+    bool _visit;
+    int _postorder;
 public:
-    Node(std::string name, std::set<int> adjacentNodes = std::set<int>())
-		: name(name), adjacentNodes(adjacentNodes), visit(false) {}
+    Node() {}
+    Node(int id, std::string name, std::set<int> adjacentNodes = std::set<int>())
+		: _id(id), _name(name), _adjacentNodes(adjacentNodes), _visit(false), _postorder() {}
+
+    int id()
+    {
+        return _id;
+    }
+
+    std::set<int> adjacentNodes()
+    {
+        return _adjacentNodes;
+    }
+
+    bool visit()
+    {
+        return _visit;
+    }
+
+    void visit(bool visit)
+    {
+        this->_visit = visit;
+    }
+
+    int postorder()
+    {
+        return _postorder;
+    }
+
+    void postorder(int postorder)
+    {
+        this->_postorder = postorder;
+    }
 
     void addAdjacentNode(int nid)
     {
-        adjacentNodes.insert(nid);
+        _adjacentNodes.insert(nid);
     }
 
 	std::string toString()

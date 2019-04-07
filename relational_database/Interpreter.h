@@ -157,6 +157,94 @@ public:
         _db[r1.name()] = r2;
     }
 
+    // Graph methods
+
+    void buildDependencyGraphs(const std::vector<Rule>& rules, Graph& dependency_graph, Graph& reverse_dependency_graph)
+    {
+        // for each rule
+        for (unsigned int i = 0; i < rules.size(); ++i)
+        {
+            // add create node and add to dependency graph and reverse dependency graphs
+            Node n = Node(i, rules.at(i).predicateHead().id());
+            dependency_graph.addNode(n.id(), n);
+            reverse_dependency_graph.addNode(n.id(), n);
+        }
+
+        // for each rule (r1)
+        for (unsigned int i = 0; i < rules.size(); ++i)
+            // for each body predicate (p) in r1 
+            for (unsigned int j = 0; j < rules.at(i).predicateList().size(); ++j)
+                // for each rule (r2)
+                for (unsigned int k = 0; k < rules.size(); ++k)
+                    // if p.name == r2.head.name, 
+                    // add edge from r1 to r2 (dependency graph) and from r2 to r1 (reverse dependency graph)
+                    if (rules.at(i).predicateList().at(j).id() == rules.at(j).predicateHead().id())
+                    {
+                        dependency_graph.node(i).addAdjacentNode(k);
+                        reverse_dependency_graph.node(k).addAdjacentNode(i);
+                    }
+    }
+
+    // DFS methods for generating SCC's from dependancy graph
+
+    void dfs(Node n, Graph& g, std::vector<int>& scc)
+    {
+        n.visit(true);
+        scc.push_back(n.id());
+        for (int nid : n.adjacentNodes())
+            if (!(g.node(nid).visit()))
+                dfs(g.node(nid), g, scc);
+    }
+
+    std::vector<std::vector<int>> dfsForest(Graph& g, std::vector<int> order)
+    {
+        std::vector<std::vector<int>> scc_vect;
+        // clear the visit mark for each node in the graph
+        for (std::map<int, Node>::iterator iter = g.nodes().begin(); iter != g.nodes().end(); ++iter)
+            iter->second.visit(false);
+
+        // run dfs in order
+        for (unsigned int i = 0; i < order.size(); ++i)
+        {
+            std::vector<int> scc;
+            dfs(g.node(i), g, scc);
+            scc_vect.push_back(scc);
+        }
+        return scc_vect;
+    }
+
+    // DFS methods for generating reverse postorder list from reverse dependancy graph
+
+    void dfs(Node n, Graph& g, int& postorder_counter, std::vector<int> reverse_postorder_vect)
+    {
+        n.visit(true);
+        for (int nid : n.adjacentNodes())
+            if (!(g.node(nid).visit()))
+                dfs(g.node(nid), g, postorder_counter, reverse_postorder_vect);
+
+        n.postorder(postorder_counter);
+        reverse_postorder_vect.push_back(n.id());
+        ++postorder_counter;
+    }
+
+    std::vector<int> dfsForest(Graph& g)
+    {
+        int postorder_counter = 1;
+        std::vector<int> reverse_postorder_vect;
+
+        // clear the visit mark for each node in the graph
+        for (std::map<int, Node>::iterator iter = g.nodes().begin(); iter != g.nodes().end(); ++iter)
+            iter->second.visit(false);
+
+        // run dfs on each unmarked node in the graph
+        for (std::map<int, Node>::iterator iter = g.nodes().begin(); iter != g.nodes().end(); ++iter)
+            if (!(iter->second.visit()))
+                dfs(iter->second, g, postorder_counter, reverse_postorder_vect);
+
+        std::reverse(reverse_postorder_vect.begin(), reverse_postorder_vect.end());
+        return reverse_postorder_vect;
+    }
+
     // Helper methods
     
     template<class T>
@@ -264,7 +352,7 @@ public:
         return out.str();
     }
 
-    std::string EvaluateRule(Rule r)
+    std::string evaluateRule(Rule r)
     {
         std::stringstream out;
         Relation r_new = Relation(r.predicateHead().id(), Scheme(), std::set<Tuple>());
@@ -293,13 +381,21 @@ public:
         return out.str();
     }
 
-    std::string EvaluateRules()
+    std::string evaluateRules()
     {
         std::stringstream out;
-        out << "Rule Evaluation" << std::endl;
         std::vector<Rule> rules = p.rules();
         int pre_count, post_count;
         int loop_count = 0;
+        Graph dependency_graph, reverse_dependency_graph;
+
+        buildDependencyGraphs(rules, dependency_graph, reverse_dependency_graph);
+        out << "Dependency Graph" << std::endl << dependency_graph.toString() << std::endl;
+        std::vector<int> order = dfsForest(reverse_dependency_graph);
+        std::vector<std::vector<int>> scc_vect = dfsForest(dependency_graph, order);
+
+        out << "Rule Evaluation" << std::endl;
+
         do 
         {
             loop_count++;
@@ -307,7 +403,7 @@ public:
             for (unsigned int i = 0; i < rules.size(); ++i)
             {
                 out << rules.at(i).toString() << std::endl;
-                out << EvaluateRule(rules.at(i));
+                out << evaluateRule(rules.at(i));
             }
             post_count = countTuples();
         }
@@ -317,22 +413,6 @@ public:
         return out.str();
     }
 
-    Graph buildDependencyGraph(const std::vector<Rule>& rules)
-    {
-        // for each rule (r1)
-        for (unsigned int i = 0; i < rules.size(); ++i)
-        {
-            Node n = Node(rules.at(i).predicateHead().id());
-            // for each body predicate (p) in r1 
-            for (unsigned int j = 0; j < rules.at(i).predicateList().size(); ++j)
-                // for each rule (r2)
-                for (unsigned int k = 0; k < rules.size(); ++k)
-                    // if p.name == r2.head.name, add edge from r1 to r2
-                    if (rules.at(i).predicateList().at(j).id() == rules.at(j).predicateHead().id())
-        }
-
-
-    } 
 };
 
 #endif // INTERPRETER_H

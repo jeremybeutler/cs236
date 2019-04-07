@@ -9,13 +9,13 @@ class Lexer
 {
 private:
 	std::ifstream &inputFile;
-	std::ostream &outputFile;
+	//std::ostream &outputFile;
 	int numTokens;
 	int lineNum;
 	std::vector<Token> tokenList;
 
 public:
-	Lexer(std::ifstream &in, std::ostream &out) : inputFile(in), outputFile(out), numTokens(0), lineNum(1) {}
+	Lexer(std::ifstream &in/*, std::ostream &out*/) : inputFile(in), /*outputFile(out),*/ numTokens(0), lineNum(1) {}
 
 	std::vector<Token> tokens()
 	{
