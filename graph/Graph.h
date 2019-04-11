@@ -30,6 +30,11 @@ public:
 		_nodes[nid] = node;
 	}
 
+	void nodeAddAdjacentNode(int nid, int adj_nid)
+    {
+        _nodes[nid].addAdjacentNode(adj_nid);
+    }
+
 	std::string toString()
 	{
 		std::stringstream out;

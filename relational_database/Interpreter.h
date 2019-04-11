@@ -178,10 +178,10 @@ public:
                 for (unsigned int k = 0; k < rules.size(); ++k)
                     // if p.name == r2.head.name, 
                     // add edge from r1 to r2 (dependency graph) and from r2 to r1 (reverse dependency graph)
-                    if (rules.at(i).predicateList().at(j).id() == rules.at(j).predicateHead().id())
+                    if (rules.at(i).predicateList().at(j).id() == rules.at(k).predicateHead().id())
                     {
-                        dependency_graph.node(i).addAdjacentNode(k);
-                        reverse_dependency_graph.node(k).addAdjacentNode(i);
+                        dependency_graph.nodeAddAdjacentNode(i, k);
+                        reverse_dependency_graph.nodeAddAdjacentNode(k, i);
                     }
     }
 
